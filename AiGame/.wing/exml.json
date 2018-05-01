@@ -1,0 +1,15 @@
+{
+  "16315eb53a3": {
+    "path": "scene\\BeginScene.ts",
+    "class": "BeginScene",
+    "parentPath": ""
+  },
+  "16315ec6608": {
+    "path": "scene\\GameScene.ts",
+    "class": "GameScene",
+    "parentPath": ""
+  },
+  "global": {
+    "globalAutoLayerMarkEnable": false
+  }
+}
