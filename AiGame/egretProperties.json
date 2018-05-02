@@ -32,6 +32,9 @@
     },
     {
       "name": "promise"
+    },
+    {
+      "name": "game"
     }
   ]
 }

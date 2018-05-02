@@ -14,7 +14,8 @@
         "eui.VSlider": "resource/eui_skins/VSliderSkin.exml",
         "eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
         "BeginScene": "resource/scene/BeginScene.exml",
-        "GameScene": "resource/scene/GameScene.exml"
+        "GameScene": "resource/scene/GameScene.exml",
+        "GameOverScene": "resource/scene/GameOverScene.exml"
     },
     "autoGenerateExmlsList": true,
     "exmls": [

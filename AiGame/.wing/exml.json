@@ -1,15 +1,30 @@
 {
-  "16315eb53a3": {
-    "path": "scene\\BeginScene.ts",
-    "class": "BeginScene",
-    "parentPath": ""
-  },
-  "16315ec6608": {
-    "path": "scene\\GameScene.ts",
-    "class": "GameScene",
-    "parentPath": ""
-  },
-  "global": {
-    "globalAutoLayerMarkEnable": false
-  }
+    "16315eb53a3": {
+        "path": "scene\\BeginScene.ts",
+        "class": "BeginScene",
+        "parentPath": ""
+    },
+    "16315ec6608": {
+        "path": "scene\\GameScene.ts",
+        "class": "GameScene",
+        "parentPath": ""
+    },
+    "global": {
+        "globalAutoLayerMarkEnable": false
+    },
+    "1631fa27f9c": {
+        "path": "..\\resource\\scene\\GameOverScene.ts",
+        "class": "GameOverScene",
+        "parentPath": ""
+    },
+    "1631fa3dc42": {
+        "path": "scene\\GameOverScene.ts",
+        "class": "GameOverScene",
+        "parentPath": ""
+    },
+    "1632003ef7f": {
+        "path": "scene\\GameOverScene.ts",
+        "class": "GameOverScene",
+        "parentPath": ""
+    }
 }

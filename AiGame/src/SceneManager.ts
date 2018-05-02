@@ -40,9 +40,14 @@ class SceneManager extends egret.Sprite {
 	 * 切换场景
 	 */
 	public changeScene(type) {
-		if(type != SceneManager.BEGIN_SCENE){
+		if(type != SceneManager.BEGIN_SCENE) {
+			console.log(this.beginScene);
 			this.beginScene.release();
 		}
+		if(type != SceneManager.GAME_SCENE) {
+			this.gameScene.release();
+		}
+
 		this.removeChildren();
 		this.addChild(this[type]);
 	}

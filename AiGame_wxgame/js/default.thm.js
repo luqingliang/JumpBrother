@@ -10,7 +10,7 @@ function __extends(d, b) {
 window.generateEUI = {};
 generateEUI.paths = {};
 generateEUI.styles = undefined;
-generateEUI.skins = {"eui.Button":"resource/eui_skins/ButtonSkin.exml","eui.CheckBox":"resource/eui_skins/CheckBoxSkin.exml","eui.HScrollBar":"resource/eui_skins/HScrollBarSkin.exml","eui.HSlider":"resource/eui_skins/HSliderSkin.exml","eui.Panel":"resource/eui_skins/PanelSkin.exml","eui.TextInput":"resource/eui_skins/TextInputSkin.exml","eui.ProgressBar":"resource/eui_skins/ProgressBarSkin.exml","eui.RadioButton":"resource/eui_skins/RadioButtonSkin.exml","eui.Scroller":"resource/eui_skins/ScrollerSkin.exml","eui.ToggleSwitch":"resource/eui_skins/ToggleSwitchSkin.exml","eui.VScrollBar":"resource/eui_skins/VScrollBarSkin.exml","eui.VSlider":"resource/eui_skins/VSliderSkin.exml","eui.ItemRenderer":"resource/eui_skins/ItemRendererSkin.exml","BeginScene":"resource/scene/BeginScene.exml","GameScene":"resource/scene/GameScene.exml"}
+generateEUI.skins = {"eui.Button":"resource/eui_skins/ButtonSkin.exml","eui.CheckBox":"resource/eui_skins/CheckBoxSkin.exml","eui.HScrollBar":"resource/eui_skins/HScrollBarSkin.exml","eui.HSlider":"resource/eui_skins/HSliderSkin.exml","eui.Panel":"resource/eui_skins/PanelSkin.exml","eui.TextInput":"resource/eui_skins/TextInputSkin.exml","eui.ProgressBar":"resource/eui_skins/ProgressBarSkin.exml","eui.RadioButton":"resource/eui_skins/RadioButtonSkin.exml","eui.Scroller":"resource/eui_skins/ScrollerSkin.exml","eui.ToggleSwitch":"resource/eui_skins/ToggleSwitchSkin.exml","eui.VScrollBar":"resource/eui_skins/VScrollBarSkin.exml","eui.VSlider":"resource/eui_skins/VSliderSkin.exml","eui.ItemRenderer":"resource/eui_skins/ItemRendererSkin.exml","BeginScene":"resource/scene/BeginScene.exml","GameScene":"resource/scene/GameScene.exml","GameOverScene":"resource/scene/GameOverScene.exml"}
 generateEUI.paths['resource/eui_skins/ButtonSkin.exml'] = window.skins.ButtonSkin = (function (_super) {
 	__extends(ButtonSkin, _super);
 	function ButtonSkin() {
@@ -708,12 +708,50 @@ generateEUI.paths['resource/eui_skins/ButtonSkin.exml'] = window.skins.ButtonSki
 	__extends(GameSceneSkin, _super);
 	function GameSceneSkin() {
 		_super.call(this);
-		this.skinParts = [];
+		this.skinParts = ["img_player","lab_score","blockPanel"];
 		
-		this.height = 300;
-		this.width = 400;
+		this.height = 1136;
+		this.width = 640;
+		this.elementsContent = [this.blockPanel_i()];
 	}
 	var _proto = GameSceneSkin.prototype;
 
+	_proto.blockPanel_i = function () {
+		var t = new eui.Group();
+		this.blockPanel = t;
+		t.bottom = 0;
+		t.left = 0;
+		t.right = 0;
+		t.top = 0;
+		t.elementsContent = [this._Image1_i(),this.img_player_i(),this.lab_score_i()];
+		return t;
+	};
+	_proto._Image1_i = function () {
+		var t = new eui.Image();
+		t.bottom = 0;
+		t.left = 0;
+		t.right = 0;
+		t.source = "bg_jpg";
+		t.top = 0;
+		return t;
+	};
+	_proto.img_player_i = function () {
+		var t = new eui.Image();
+		this.img_player = t;
+		t.source = "piece_png";
+		t.x = 200;
+		t.y = 568;
+		return t;
+	};
+	_proto.lab_score_i = function () {
+		var t = new eui.Label();
+		this.lab_score = t;
+		t.size = 90;
+		t.text = "0";
+		t.textColor = 0x050000;
+		t.x = 100;
+		t.y = 100;
+		return t;
+	};
 	return GameSceneSkin;
 })(eui.Skin);
