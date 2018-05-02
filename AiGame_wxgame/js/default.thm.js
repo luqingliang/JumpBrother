@@ -706,13 +706,53 @@ generateEUI.paths['resource/eui_skins/ButtonSkin.exml'] = window.skins.ButtonSki
 	return BeginSceneSkin;
 })(eui.Skin);generateEUI.paths['resource/scene/GameScene.exml'] = window.GameSceneSkin = (function (_super) {
 	__extends(GameSceneSkin, _super);
+	var GameSceneSkin$Skin2 = 	(function (_super) {
+		__extends(GameSceneSkin$Skin2, _super);
+		function GameSceneSkin$Skin2() {
+			_super.call(this);
+			this.skinParts = ["labelDisplay"];
+			
+			this.elementsContent = [this._Image1_i(),this.labelDisplay_i()];
+			this.states = [
+				new eui.State ("up",
+					[
+					])
+				,
+				new eui.State ("down",
+					[
+					])
+				,
+				new eui.State ("disabled",
+					[
+					])
+			];
+		}
+		var _proto = GameSceneSkin$Skin2.prototype;
+
+		_proto._Image1_i = function () {
+			var t = new eui.Image();
+			t.percentHeight = 100;
+			t.source = "restart_btn_png";
+			t.percentWidth = 100;
+			return t;
+		};
+		_proto.labelDisplay_i = function () {
+			var t = new eui.Label();
+			this.labelDisplay = t;
+			t.horizontalCenter = 0;
+			t.verticalCenter = 0;
+			return t;
+		};
+		return GameSceneSkin$Skin2;
+	})(eui.Skin);
+
 	function GameSceneSkin() {
 		_super.call(this);
-		this.skinParts = ["img_player","lab_score","blockPanel"];
+		this.skinParts = ["img_player","lab_score","blockPanel","btn_reStart","lab_overScore","GameOverPanel"];
 		
 		this.height = 1136;
 		this.width = 640;
-		this.elementsContent = [this.blockPanel_i()];
+		this.elementsContent = [this.blockPanel_i(),this.GameOverPanel_i()];
 	}
 	var _proto = GameSceneSkin.prototype;
 
@@ -751,6 +791,57 @@ generateEUI.paths['resource/eui_skins/ButtonSkin.exml'] = window.skins.ButtonSki
 		t.textColor = 0x050000;
 		t.x = 100;
 		t.y = 100;
+		return t;
+	};
+	_proto.GameOverPanel_i = function () {
+		var t = new eui.Group();
+		this.GameOverPanel = t;
+		t.bottom = 0;
+		t.left = 0;
+		t.right = 0;
+		t.top = 0;
+		t.elementsContent = [this._Rect1_i(),this.btn_reStart_i(),this._Label1_i(),this.lab_overScore_i()];
+		return t;
+	};
+	_proto._Rect1_i = function () {
+		var t = new eui.Rect();
+		t.bottom = 0;
+		t.fillAlpha = 0.6;
+		t.left = 0;
+		t.right = 0;
+		t.top = 0;
+		return t;
+	};
+	_proto.btn_reStart_i = function () {
+		var t = new eui.Button();
+		this.btn_reStart = t;
+		t.horizontalCenter = 0.5;
+		t.label = "";
+		t.y = 775.94;
+		t.skinName = GameSceneSkin$Skin2;
+		return t;
+	};
+	_proto._Label1_i = function () {
+		var t = new eui.Label();
+		t.fontFamily = "Microsoft YaHei";
+		t.size = 50;
+		t.text = "本次分数";
+		t.x = 220;
+		t.y = 190;
+		return t;
+	};
+	_proto.lab_overScore_i = function () {
+		var t = new eui.Label();
+		this.lab_overScore = t;
+		t.anchorOffsetX = 0;
+		t.fontFamily = "Microsoft YaHei";
+		t.horizontalCenter = 0;
+		t.size = 50;
+		t.text = "0";
+		t.textAlign = "center";
+		t.verticalAlign = "middle";
+		t.width = 391;
+		t.y = 278;
 		return t;
 	};
 	return GameSceneSkin;

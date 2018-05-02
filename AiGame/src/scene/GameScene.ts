@@ -6,6 +6,13 @@ class GameScene extends eui.Component implements  eui.UIComponent {
 	public img_player:eui.Image;
 	//计分lable
 	public lab_score:eui.Label;
+    //游戏结束面板
+    public GameOverPanel:eui.Group;
+    //再来一次按钮
+    public btn_reStart:eui.Button;
+    //结束游戏计分
+    public lab_overScore:eui.Label;
+
 
 	// 所有方块资源的数组
     private blockSourceNames: Array<string> = [];
@@ -60,6 +67,8 @@ class GameScene extends eui.Component implements  eui.UIComponent {
 	}
 	
 	private init() {
+        this.setGameOverPanel(false);
+
 		this.blockSourceNames = ["block1_png", "block2_png", "block3_png"];
 		//初始化音频
 		this.pushVoice = RES.getRes('push_mp3');
@@ -108,6 +117,8 @@ class GameScene extends eui.Component implements  eui.UIComponent {
         this.blockPanel.addChild(this.img_player);
         // 结束跳跃状态
         this.isReadyJump = false;
+        //屏蔽鼠标事件（防止反复点按）
+        this.blockPanel.touchEnabled = false;
         // 落点坐标
         this.targetPos.x = this.img_player.x + this.jumpDistance * this.direction;
         // 根据落点重新计算斜率,确保小人往目标中心跳跃
@@ -128,6 +139,66 @@ class GameScene extends eui.Component implements  eui.UIComponent {
             this.img_player.anchorOffsetY = this.img_player.height - 20;
         });
 	}
+    private judgeResult() {
+        // 根据this.jumpDistance来判断跳跃是否成功
+        if (Math.pow(this.currentBlock.x - this.img_player.x, 2) + Math.pow(this.currentBlock.y - this.img_player.y, 2) <= 70 * 70) {
+            // 更新积分
+            this.score++;
+            this.lab_score.text = this.score.toString();
+            //放开面板的点击事件
+            this.blockPanel.touchEnabled = true;
+            // 随机下一个方块出现的位置
+            this.direction = Math.random() > 0.5 ? 1 : -1;
+            // 当前方块要移动到相应跳跃点的距离
+            var blockX, blockY;
+            blockX = this.direction > 0 ? this.leftOrigin.x : this.rightOrigin.x;
+            blockY = this.height / 2 + this.currentBlock.height;
+            // 小人要移动到的点.
+            var playerX, PlayerY;
+            playerX = this.img_player.x - (this.currentBlock.x - blockX);
+            PlayerY = this.img_player.y - (this.currentBlock.y - blockY);
+            // 更新页面
+            this.update(this.currentBlock.x - blockX, this.currentBlock.y - blockY);
+            // 更新小人的位置
+            egret.Tween.get(this.img_player).to({
+                x: playerX,
+                y: PlayerY
+            }, 500).call(() => {
+                // 开始创建下一个方块
+                this.addBlock();
+                // 让屏幕重新可点;
+                this.blockPanel.touchEnabled = true;
+            })
+            // console.log('x' + x);
+            console.log(this.currentBlock.x);
+        } else {
+            // 失败,弹出重新开始的panel
+            console.log('游戏失败!');
+            this.lab_score.text = "0";
+            this.setGameOverPanel(true);
+        }
+    }
+	// 更新整个舞台(位移动画)
+    private update(x, y) {
+        egret.Tween.removeAllTweens();
+        for (var i: number = this.blockArr.length - 1; i >= 0; i--) {
+            var blockNode = this.blockArr[i];
+            if (blockNode.x + (blockNode.width - 222) < 0 || blockNode.x - 222 > this.width || blockNode.y - 78 > this.height) {
+                // 方块超出屏幕,从显示列表中移除
+                this.blockPanel.removeChild(blockNode);
+                this.blockArr.splice(i, 1);
+                // 添加到回收数组中
+                this.reBackBlockArr.push(blockNode);
+            } else {
+                // 没有超出屏幕的话,则移动
+                egret.Tween.get(blockNode).to({
+                    x: blockNode.x - x,
+                    y: blockNode.y - y
+                }, 500)
+            }
+        }
+        console.log(this.blockArr);
+    }
 
 	// 重置游戏
 	public reset() {
@@ -147,9 +218,12 @@ class GameScene extends eui.Component implements  eui.UIComponent {
 		this.blockPanel.addChild(this.img_player);
 		this.direction = 1;
 		// 添加积分
+        this.score = 0;
 		this.blockPanel.addChild(this.lab_score);
 		// 添加下一个方块
 		this.addBlock();
+        //放开舞台的点击事件
+        this.blockPanel.touchEnabled = true;
 	}
 	// 添加一个方块
 	private addBlock() {
@@ -188,63 +262,7 @@ class GameScene extends eui.Component implements  eui.UIComponent {
 		this.blockArr.push(blockNode);
 		return blockNode;
 	}
-	 private judgeResult() {
-        // 根据this.jumpDistance来判断跳跃是否成功
-        if (Math.pow(this.currentBlock.x - this.img_player.x, 2) + Math.pow(this.currentBlock.y - this.img_player.y, 2) <= 70 * 70) {
-            // 更新积分
-            this.score++;
-            this.lab_score.text = this.score.toString();
-            // 随机下一个方块出现的位置
-            this.direction = Math.random() > 0.5 ? 1 : -1;
-            // 当前方块要移动到相应跳跃点的距离
-            var blockX, blockY;
-            blockX = this.direction > 0 ? this.leftOrigin.x : this.rightOrigin.x;
-            blockY = this.height / 2 + this.currentBlock.height;
-            // 小人要移动到的点.
-            var playerX, PlayerY;
-            playerX = this.img_player.x - (this.currentBlock.x - blockX);
-            PlayerY = this.img_player.y - (this.currentBlock.y - blockY);
-            // 更新页面
-            this.update(this.currentBlock.x - blockX, this.currentBlock.y - blockY);
-            // 更新小人的位置
-            egret.Tween.get(this.img_player).to({
-                x: playerX,
-                y: PlayerY
-            }, 1000).call(() => {
-                // 开始创建下一个方块
-                this.addBlock();
-                // 让屏幕重新可点;
-                this.blockPanel.touchEnabled = true;
-            })
-            // console.log('x' + x);
-            console.log(this.currentBlock.x);
-        } else {
-            // 失败,弹出重新开始的panel
-            console.log('游戏失败!')
-        }
-    }
-	// 更新整个舞台(位移动画)
-    private update(x, y) {
-        egret.Tween.removeAllTweens();
-        for (var i: number = this.blockArr.length - 1; i >= 0; i--) {
-            var blockNode = this.blockArr[i];
-            if (blockNode.x + (blockNode.width - 222) < 0 || blockNode.x - 222 > this.width || blockNode.y - 78 > this.height) {
-                // 方块超出屏幕,从显示列表中移除
-                this.blockPanel.removeChild(blockNode);
-                this.blockArr.splice(i, 1);
-                // 添加到回收数组中
-                this.reBackBlockArr.push(blockNode);
-            } else {
-                // 没有超出屏幕的话,则移动
-                egret.Tween.get(blockNode).to({
-                    x: blockNode.x - x,
-                    y: blockNode.y - y
-                }, 1000)
-            }
-        }
-        console.log(this.blockArr);
 
-    }
     //添加factor的set,get方法,注意用public  
     public get factor(): number {
         return 0;
@@ -254,7 +272,37 @@ class GameScene extends eui.Component implements  eui.UIComponent {
         this.img_player.x = (1 - value) * (1 - value) * this.img_player.x + 2 * value * (1 - value) * (this.img_player.x + this.targetPos.x) / 2 + value * value * (this.targetPos.x);
         this.img_player.y = (1 - value) * (1 - value) * this.img_player.y + 2 * value * (1 - value) * (this.targetPos.y - 300) + value * value * (this.targetPos.y);
     }
+
+    /**
+     * 控制游戏结束面板的显示隐藏
+     * @param type:boolean
+     */
+    private setGameOverPanel(type: boolean) {
+        this.GameOverPanel.visible = type;
+        if(type) {
+            this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
+            this.lab_overScore.text = this.score.toString();
+        } else {
+            if(this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_reStart.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
+            }
+        }
+    }
+    private reStartHandler() {
+        this.reset();
+        this.setGameOverPanel(false);
+    }
 	public release() {
-		
+        this.reset();
+
+		if(this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+            this.btn_reStart.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
+        }
+        if(this.blockPanel.hasEventListener(egret.TouchEvent.TOUCH_BEGIN)) {
+            this.blockPanel.removeEventListener(egret.TouchEvent.TOUCH_BEGIN,this.keyDownHandler,this);
+        }
+        if(this.blockPanel.hasEventListener(egret.TouchEvent.TOUCH_END)) {
+            this.blockPanel.removeEventListener(egret.TouchEvent.TOUCH_END,this.keyUpHandler,this);
+        }
 	}
 }

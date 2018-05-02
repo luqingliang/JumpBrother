@@ -26,5 +26,10 @@
         "path": "scene\\GameOverScene.ts",
         "class": "GameOverScene",
         "parentPath": ""
+    },
+    "163203c30fa": {
+        "path": "scene\\GameOverScene.ts",
+        "class": "GameOverScene",
+        "parentPath": ""
     }
 }
