@@ -23,6 +23,9 @@ class SceneManager extends egret.Sprite {
 	private init(){
 		this.beginScene = new BeginScene();
 		this.gameScene = new GameScene();
+		//也在这里初始化AiManager类
+		AiManager.init();
+		console.log(AiManager.pointArray.pointArr);
 
 		this.addChild(this.beginScene);
 	}
@@ -39,7 +42,7 @@ class SceneManager extends egret.Sprite {
 	/**
 	 * 切换场景
 	 */
-	public changeScene(type) {
+	public changeScene(type, data:any = null) {
 		if(type != SceneManager.BEGIN_SCENE) {
 			console.log(this.beginScene);
 			this.beginScene.release();
@@ -47,7 +50,9 @@ class SceneManager extends egret.Sprite {
 		if(type != SceneManager.GAME_SCENE) {
 			this.gameScene.release();
 		}
-
+		if(data != null){
+			this[type].update(data);
+		}
 		this.removeChildren();
 		this.addChild(this[type]);
 	}

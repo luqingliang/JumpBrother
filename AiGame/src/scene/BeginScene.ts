@@ -24,7 +24,7 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 	}
 	private tapHandler() {
 		//切换到游戏中场景
-		SceneManager.Instance().changeScene(SceneManager.GAME_SCENE);
+		SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
 	}	
 	public release() {
 		if(this.btn_begin.hasEventListener(egret.TouchEvent.TOUCH_TAP)){

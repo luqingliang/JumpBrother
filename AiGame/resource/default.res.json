@@ -1,7 +1,7 @@
 {
 	"groups": [
 		{
-			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,bg_jpg,egret_icon_png,description_json,streak_png,back_btn_png,block1_png,block2_png,block3_png,finger_png,jump_mp3,piece_png,push_mp3,relive_png,restart_btn_png,setting_bg_jpg,setting_btn_png,setting_off_png,setting_on_png,start_btn_png",
+			"keys": "checkbox_select_disabled_png,checkbox_select_down_png,checkbox_select_up_png,checkbox_unselect_png,selected_png,border_png,header_png,radiobutton_select_disabled_png,radiobutton_select_down_png,radiobutton_select_up_png,radiobutton_unselect_png,roundthumb_png,thumb_png,track_png,tracklight_png,handle_png,off_png,on_png,button_down_png,button_up_png,thumb_pb_png,track_pb_png,track_sb_png,bg_jpg,egret_icon_png,description_json,streak_png,back_btn_png,block1_png,block2_png,block3_png,finger_png,jump_mp3,piece_png,push_mp3,relive_png,restart_btn_png,setting_bg_jpg,setting_btn_png,setting_off_png,setting_on_png,start_btn_png,img_GoBang_bg_jpg,img_GoBang_black_png,img_GoBang_white_png",
 			"name": "preload"
 		}
 	],
@@ -215,6 +215,21 @@
 			"name": "start_btn_png",
 			"type": "image",
 			"url": "assets/start_btn.png"
+		},
+		{
+			"name": "img_GoBang_bg_jpg",
+			"type": "image",
+			"url": "assets/img_GoBang_bg.jpg"
+		},
+		{
+			"name": "img_GoBang_black_png",
+			"type": "image",
+			"url": "assets/img_GoBang_black.png"
+		},
+		{
+			"name": "img_GoBang_white_png",
+			"type": "image",
+			"url": "assets/img_GoBang_white.png"
 		}
 	]
 }
