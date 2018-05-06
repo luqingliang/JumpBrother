@@ -488,11 +488,21 @@ var PointArray = (function () {
             }
         }
     }
+    //重置数组
+    PointArray.prototype.reSet = function () {
+        for (var i = 0; i < 15; i++) {
+            for (var j = 0; j < 15; j++) {
+                if (this.pointArr[i][j] != 0) {
+                    this.pointArr[i][j] = 0;
+                }
+            }
+        }
+    };
     //用来判断输赢的函数
     PointArray.prototype.searchWinner = function (x, y) {
         var a = 0;
         //横着是否有五连
-        for (var i = y; i < 15; i++) {
+        for (var i = y + 1; i < 15; ++i) {
             if (this.pointArr[x][i] == this.pointArr[x][y]) {
                 a++;
             }
@@ -500,7 +510,7 @@ var PointArray = (function () {
                 break;
             }
         }
-        for (var i = y; i > 0; i--) {
+        for (var i = y - 1; i >= 0; --i) {
             if (this.pointArr[x][i] == this.pointArr[x][y]) {
                 a++;
             }
@@ -513,7 +523,7 @@ var PointArray = (function () {
         }
         //竖着是否有五连
         a = 0;
-        for (var i = x; i < 15; i++) {
+        for (var i = x + 1; i < 15; ++i) {
             if (this.pointArr[i][y] == this.pointArr[x][y]) {
                 a++;
             }
@@ -521,7 +531,7 @@ var PointArray = (function () {
                 break;
             }
         }
-        for (var i = x; i > 0; i--) {
+        for (var i = x - 1; i >= 0; --i) {
             if (this.pointArr[i][y] == this.pointArr[x][y]) {
                 a++;
             }
@@ -533,7 +543,47 @@ var PointArray = (function () {
             return true;
         }
         //正斜是否有五连
+        a = 0;
+        for (var i = x - 1, j = y - 1; i >= 0 && j >= 0; --i, --j) {
+            if (this.pointArr[i][j] == this.pointArr[x][y]) {
+                a++;
+            }
+            else {
+                break;
+            }
+        }
+        for (var i = x + 1, j = y + 1; i < 15 && j < 15; ++i, ++j) {
+            if (this.pointArr[i][j] == this.pointArr[x][y]) {
+                a++;
+            }
+            else {
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            return true;
+        }
         //反斜是否有五连
+        a = 0;
+        for (var i = x - 1, j = y + 1; i >= 0 && j < 15; --i, ++j) {
+            if (this.pointArr[i][j] == this.pointArr[x][y]) {
+                a++;
+            }
+            else {
+                break;
+            }
+        }
+        for (var i = x + 1, j = y - 1; i < 15 && j >= 0; ++i, --j) {
+            if (this.pointArr[i][j] == this.pointArr[x][y]) {
+                a++;
+            }
+            else {
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            return true;
+        }
         return false;
     };
     return PointArray;
@@ -601,10 +651,10 @@ var GameScene = (function (_super) {
     };
     GameScene.prototype.init = function () {
         this.setGameOverPanel(false);
-        this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png"];
+        this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png", "img_GoBang_bg_png"];
         //添加触摸点击事件
         this.blockPanel.touchEnabled = true;
-        this.img_bg.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickHandler, this);
+        this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickHandler, this);
     };
     //触摸点击事件的回调
     GameScene.prototype.clickHandler = function (e) {
@@ -655,17 +705,16 @@ var GameScene = (function (_super) {
         AiManager.pointArray.pointArr[x][y] = this.blockColor ? 1 : 2;
         // 把新创建的棋子加进入blockArr里
         this.blockArr.push(blockNode);
+        // 记录最新的棋子
+        this.currentBlock = blockNode;
         //判断输赢
-        console.log(AiManager.pointArray.searchWinner(x, y));
+        if (AiManager.pointArray.searchWinner(x, y)) {
+            //赢了显示游戏结束面板
+            this.setGameOverPanel(true);
+        }
         //交替回合
         this.blockColor = !this.blockColor;
         this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑回合...";
-        // 记录最新的棋子
-        this.currentBlock = blockNode;
-    };
-    // 重置游戏
-    GameScene.prototype.reset = function () {
-        this.blockArr.length = 0;
     };
     // 工厂方法，创建一个方块并返回。
     GameScene.prototype.createBlock = function () {
@@ -679,6 +728,14 @@ var GameScene = (function (_super) {
         }
         return blockNode;
     };
+    // 重置游戏
+    GameScene.prototype.reset = function () {
+        this.blockPanel.removeChildren();
+        //重置棋盘落子数组
+        AiManager.pointArray.reSet();
+        this.blockArr.length = 0;
+        this.blockColor = true;
+    };
     /**
      * 控制游戏结束面板的显示隐藏
      * @param type:boolean
@@ -686,6 +743,7 @@ var GameScene = (function (_super) {
     GameScene.prototype.setGameOverPanel = function (type) {
         this.GameOverPanel.visible = type;
         if (type) {
+            this.lab_overWinner.text = this.blockColor ? "白方胜利" : "黑方胜利";
             this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP, this.reStartHandler, this);
         }
         else {

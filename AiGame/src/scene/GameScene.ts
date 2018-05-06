@@ -12,6 +12,8 @@
 	public img_bg:eui.Image;
 	//回合的显示
 	public lab_huiHe:eui.Label;
+	//结束界面显示输赢情况
+	public lab_overWinner:eui.Label;
 
 	// 所有方块资源的数组
     private blockSourceNames: Array<string> = [];
@@ -49,10 +51,10 @@
 	private init() {
         this.setGameOverPanel(false);
 
-		this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png"];
+		this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png","img_GoBang_bg_png"];
 		//添加触摸点击事件
 		this.blockPanel.touchEnabled = true;
-		this.img_bg.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickHandler,this);
+		this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickHandler,this);
 	}
 	//触摸点击事件的回调
 	private clickHandler(e:egret.TouchEvent) {
@@ -102,17 +104,16 @@
 		AiManager.pointArray.pointArr[x][y] = this.blockColor?1:2;
 		// 把新创建的棋子加进入blockArr里
 		this.blockArr.push(blockNode);
+		// 记录最新的棋子
+		this.currentBlock = blockNode;
 		//判断输赢
-		console.log(AiManager.pointArray.searchWinner(x,y));
+		if(AiManager.pointArray.searchWinner(x,y)) {
+			//赢了显示游戏结束面板
+			this.setGameOverPanel(true);
+		}
 		//交替回合
 		this.blockColor = !this.blockColor;
 		this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
-		// 记录最新的棋子
-		this.currentBlock = blockNode;
-	}
-	// 重置游戏
-	private reset() {
-		this.blockArr.length = 0;
 	}
 	// 工厂方法，创建一个方块并返回。
 	private createBlock(): eui.Image {
@@ -125,6 +126,14 @@
 		}
 		return blockNode;
 	}
+	// 重置游戏
+	private reset() {
+		this.blockPanel.removeChildren();
+		//重置棋盘落子数组
+		AiManager.pointArray.reSet();
+		this.blockArr.length = 0;
+		this.blockColor = true;
+	}
 
     /**
      * 控制游戏结束面板的显示隐藏
@@ -133,6 +142,7 @@
     private setGameOverPanel(type: boolean) {
         this.GameOverPanel.visible = type;
         if(type) {
+			this.lab_overWinner.text = this.blockColor?"白方胜利":"黑方胜利";
             this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
         } else {
             if(this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
