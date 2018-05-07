@@ -82,7 +82,6 @@
 		}
 
 		this.addBlock(finalX, finalY);
-		console.log("点击到了第 "+finalX+" 行，第 "+finalY+" 列！")
 	}
 	// 添加一个方块
 	private addBlock(x: number, y: number) {
@@ -90,7 +89,6 @@
 		if(AiManager.pointArray.pointArr[x][y] != 0) {
 			return;
 		}
-		console.log(AiManager.pointArray.pointArr);
 		// 创建一个方块
 		let blockNode = this.createBlock();
 		this.blockPanel.addChild(blockNode);
@@ -114,6 +112,14 @@
 		//交替回合
 		this.blockColor = !this.blockColor;
 		this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
+		if(this.blockColor == false) { //AI下棋
+			this.blockPanel.touchEnabled = false;
+			let arr: Array<number> = AiManager.ai.getPoint();
+			this.addBlock(arr[0], arr[1]);
+			console.log("电脑选择走第 "+arr[0]+" 行，第 "+arr[1]+" 列！")
+		} else {
+			this.blockPanel.touchEnabled = true;
+		}
 	}
 	// 工厂方法，创建一个方块并返回。
 	private createBlock(): eui.Image {

@@ -14,7 +14,9 @@ class PointArray {
 			}
 		}
 	}
-	//重置数组
+	/**
+	 * 重置数组
+	 */
 	public reSet() {
 		for(let i = 0; i < 15; i++) {
 			for(let j = 0; j < 15; j++) {
@@ -24,7 +26,27 @@ class PointArray {
 			}
 		}
 	}
-	//用来判断输赢的函数
+	/**
+	 * 获取某个位置是否有邻居
+	 */
+	public getNeighbor(x: number, y: number): boolean {
+		if((x>0 && this.pointArr[x-1][y] != 0) || (x<14 && this.pointArr[x+1][y] != 0)) {
+			return true;
+		}
+		if((y>0 && this.pointArr[x][y-1] != 0) || (y<14 && this.pointArr[x][y+1] != 0)) {
+			return true;
+		}
+		if((x>0 && y>0 && this.pointArr[x-1][y-1] != 0) || (x<14 && y<14 && this.pointArr[x+1][y+1] != 0)) {
+			return true;
+		}
+		if((x>0 && y<14 && this.pointArr[x-1][y+1] != 0) || (x<14 && y>0 && this.pointArr[x+1][y-1] != 0)) {
+			return true;
+		}
+		return false;
+	}
+	/**
+	 * 用来判断输赢的函数
+	 */
 	public searchWinner(x: number, y: number): boolean {
 		let a: number = 0;
 		//横着是否有五连

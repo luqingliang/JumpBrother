@@ -43,6 +43,20 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var AiManager = (function () {
+    function AiManager() {
+    }
+    /**
+     * 初始化
+     */
+    AiManager.init = function () {
+        this.pointArray = new PointArray();
+        this.score = new Score();
+        this.ai = new AiPlayer();
+    };
+    return AiManager;
+}());
+__reflect(AiManager.prototype, "AiManager");
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -101,55 +115,6 @@ var AssetAdapter = (function () {
     return AssetAdapter;
 }());
 __reflect(AssetAdapter.prototype, "AssetAdapter", ["eui.IAssetAdapter"]);
-//////////////////////////////////////////////////////////////////////////////////////
-//
-//  Copyright (c) 2014-present, Egret Technology.
-//  All rights reserved.
-//  Redistribution and use in source and binary forms, with or without
-//  modification, are permitted provided that the following conditions are met:
-//
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the Egret nor the
-//       names of its contributors may be used to endorse or promote products
-//       derived from this software without specific prior written permission.
-//
-//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
-//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-//////////////////////////////////////////////////////////////////////////////////////
-var LoadingUI = (function (_super) {
-    __extends(LoadingUI, _super);
-    function LoadingUI() {
-        var _this = _super.call(this) || this;
-        _this.createView();
-        return _this;
-    }
-    LoadingUI.prototype.createView = function () {
-        this.textField = new egret.TextField();
-        this.addChild(this.textField);
-        this.textField.y = 300;
-        this.textField.width = 480;
-        this.textField.height = 100;
-        this.textField.textAlign = "center";
-    };
-    LoadingUI.prototype.onProgress = function (current, total) {
-        this.textField.text = "Loading..." + current + "/" + total;
-    };
-    return LoadingUI;
-}(egret.Sprite));
-__reflect(LoadingUI.prototype, "LoadingUI", ["RES.PromiseTaskReporter"]);
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -463,15 +428,106 @@ var ThemeAdapter = (function () {
     return ThemeAdapter;
 }());
 __reflect(ThemeAdapter.prototype, "ThemeAdapter", ["eui.IThemeAdapter"]);
-var AiManager = (function () {
-    function AiManager() {
+//////////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (c) 2014-present, Egret Technology.
+//  All rights reserved.
+//  Redistribution and use in source and binary forms, with or without
+//  modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of the Egret nor the
+//       names of its contributors may be used to endorse or promote products
+//       derived from this software without specific prior written permission.
+//
+//  THIS SOFTWARE IS PROVIDED BY EGRET AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+//  OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+//  OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+//  IN NO EVENT SHALL EGRET AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+//  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+//  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;LOSS OF USE, DATA,
+//  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+//  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+//  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+//  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+//////////////////////////////////////////////////////////////////////////////////////
+var LoadingUI = (function (_super) {
+    __extends(LoadingUI, _super);
+    function LoadingUI() {
+        var _this = _super.call(this) || this;
+        _this.createView();
+        return _this;
     }
-    AiManager.init = function () {
-        this.pointArray = new PointArray();
+    LoadingUI.prototype.createView = function () {
+        this.textField = new egret.TextField();
+        this.addChild(this.textField);
+        this.textField.y = 300;
+        this.textField.width = 480;
+        this.textField.height = 100;
+        this.textField.textAlign = "center";
     };
-    return AiManager;
+    LoadingUI.prototype.onProgress = function (current, total) {
+        this.textField.text = "Loading..." + current + "/" + total;
+    };
+    return LoadingUI;
+}(egret.Sprite));
+__reflect(LoadingUI.prototype, "LoadingUI", ["RES.PromiseTaskReporter"]);
+var AiPlayer = (function () {
+    function AiPlayer() {
+    }
+    /**
+     * version1 : 先简单的随机一个位置下棋
+     * version2 : 随机棋子必须出现在敌方棋子相邻处（防守能力加强）
+     * version3 : 随机棋子即可出现在敌方棋子相邻处也可以出现在我方棋子相邻处
+     * version4 : 遍历搜索所有可以落子的点，并选择分数最高的点落子(这里先简单处理只遍历有邻居的点)
+     * version5 : 通过评估对白子最有利的点和对黑子最有利的点谁的分更高，来简单实现进攻和防守
+     */
+    AiPlayer.prototype.getPoint = function () {
+        // for(let i = 0; i < (15 * 15); i++) {
+        // 	let x = Math.floor(Math.random() * 15);
+        // 	let y = Math.floor(Math.random() * 15);
+        // 	if(AiManager.pointArray.pointArr[x][y] == 0) {
+        // 		if(AiManager.pointArray.getNeighbor(x,y)) {
+        // 			return [x, y];
+        // 		}
+        // 	}
+        // }
+        var maxScore1 = 0;
+        var maxScore2 = 0;
+        var x = 0;
+        var y = 0;
+        var x1 = 0;
+        var y1 = 0;
+        for (var i = 0; i < 15; i++) {
+            for (var j = 0; j < 15; j++) {
+                if (AiManager.pointArray.pointArr[i][j] == 0 && AiManager.pointArray.getNeighbor(i, j)) {
+                    var c = AiManager.score.getScore(i, j, false);
+                    var d = AiManager.score.getScore(i, j, true);
+                    if (c > maxScore1) {
+                        maxScore1 = c;
+                        x = i;
+                        y = j;
+                    }
+                    if (d > maxScore2) {
+                        maxScore2 = d;
+                        x1 = i;
+                        y1 = j;
+                    }
+                }
+            }
+        }
+        console.log('白子最大分数 ' + maxScore2);
+        console.log('黑子最大分数 ' + maxScore1);
+        return [(maxScore1 >= maxScore2 ? x : x1), (maxScore1 >= maxScore2 ? y : y1)]; //大于等于，优先进攻
+    };
+    return AiPlayer;
 }());
-__reflect(AiManager.prototype, "AiManager");
+__reflect(AiPlayer.prototype, "AiPlayer");
 var PointArray = (function () {
     function PointArray() {
         /**
@@ -488,7 +544,9 @@ var PointArray = (function () {
             }
         }
     }
-    //重置数组
+    /**
+     * 重置数组
+     */
     PointArray.prototype.reSet = function () {
         for (var i = 0; i < 15; i++) {
             for (var j = 0; j < 15; j++) {
@@ -498,7 +556,27 @@ var PointArray = (function () {
             }
         }
     };
-    //用来判断输赢的函数
+    /**
+     * 获取某个位置是否有邻居
+     */
+    PointArray.prototype.getNeighbor = function (x, y) {
+        if ((x > 0 && this.pointArr[x - 1][y] != 0) || (x < 14 && this.pointArr[x + 1][y] != 0)) {
+            return true;
+        }
+        if ((y > 0 && this.pointArr[x][y - 1] != 0) || (y < 14 && this.pointArr[x][y + 1] != 0)) {
+            return true;
+        }
+        if ((x > 0 && y > 0 && this.pointArr[x - 1][y - 1] != 0) || (x < 14 && y < 14 && this.pointArr[x + 1][y + 1] != 0)) {
+            return true;
+        }
+        if ((x > 0 && y < 14 && this.pointArr[x - 1][y + 1] != 0) || (x < 14 && y > 0 && this.pointArr[x + 1][y - 1] != 0)) {
+            return true;
+        }
+        return false;
+    };
+    /**
+     * 用来判断输赢的函数
+     */
     PointArray.prototype.searchWinner = function (x, y) {
         var a = 0;
         //横着是否有五连
@@ -589,6 +667,196 @@ var PointArray = (function () {
     return PointArray;
 }());
 __reflect(PointArray.prototype, "PointArray");
+var Score = (function () {
+    function Score() {
+        /*
+        * 给单个棋形打分
+        * 用一个7位数表示棋型，从高位到低位分别表示
+        * 连五，活四，眠四，活三，活二/眠三，活一/眠二, 眠一
+        */
+        this.singleScore = {
+            ONE: 10,
+            TWO: 100,
+            THREE: 1000,
+            FOUR: 100000,
+            FIVE: 1000000,
+            BLOCKED_ONE: 1,
+            BLOCKED_TWO: 10,
+            BLOCKED_THREE: 100,
+            BLOCKED_FOUR: 10000
+        };
+    }
+    /**
+     * 评分函数，返回单个位置八种可能性得分的合(原理和输赢判定函数差不多)
+     * 判断的时候约定2就是电脑ai下的黑子
+     * version1 : 电脑不能只考虑进攻，还要进行防守，所以这里新增一个代表黑子或者白子的标识位
+     */
+    Score.prototype.getScore = function (x, y, player) {
+        var scoreSum = 0;
+        var a = 0;
+        var isBlocked = false;
+        //横着是否有五连
+        for (var i = y + 1; i < 15; ++i) {
+            if (AiManager.pointArray.pointArr[x][i] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[x][i] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        for (var i = y - 1; i >= 0; --i) {
+            if (AiManager.pointArray.pointArr[x][i] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[x][i] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            scoreSum += this.matchingScore(500);
+        }
+        else {
+            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+        }
+        //竖着是否有五连
+        a = 0;
+        isBlocked = false;
+        for (var i = x + 1; i < 15; ++i) {
+            if (AiManager.pointArray.pointArr[i][y] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][y] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        for (var i = x - 1; i >= 0; --i) {
+            if (AiManager.pointArray.pointArr[i][y] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][y] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            scoreSum += this.matchingScore(500);
+        }
+        else {
+            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+        }
+        //正斜是否有五连
+        a = 0;
+        isBlocked = false;
+        for (var i = x - 1, j = y - 1; i >= 0 && j >= 0; --i, --j) {
+            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        for (var i = x + 1, j = y + 1; i < 15 && j < 15; ++i, ++j) {
+            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            scoreSum += this.matchingScore(500);
+        }
+        else {
+            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+        }
+        //反斜是否有五连
+        a = 0;
+        isBlocked = false;
+        for (var i = x - 1, j = y + 1; i >= 0 && j < 15; --i, ++j) {
+            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        for (var i = x + 1, j = y - 1; i < 15 && j >= 0; ++i, --j) {
+            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+                a++;
+            }
+            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+                break;
+            }
+            else {
+                isBlocked = true;
+                break;
+            }
+        }
+        if (a + 1 >= 5) {
+            scoreSum += this.matchingScore(500);
+        }
+        else {
+            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+        }
+        return scoreSum;
+    };
+    /**
+     * 分数匹配函数（这里选择数字比较而不是字符串比较）
+     */
+    Score.prototype.matchingScore = function (type) {
+        switch (type) {
+            case 100:
+                return this.singleScore.ONE;
+            case 200:
+                return this.singleScore.TWO;
+            case 300:
+                return this.singleScore.THREE;
+            case 400:
+                return this.singleScore.FOUR;
+            case 500:
+                return this.singleScore.FIVE;
+            case 101:
+                return this.singleScore.BLOCKED_ONE;
+            case 201:
+                return this.singleScore.BLOCKED_TWO;
+            case 301:
+                return this.singleScore.BLOCKED_THREE;
+            case 401:
+                return this.singleScore.BLOCKED_FOUR;
+            default:
+                return 0;
+        }
+    };
+    return Score;
+}());
+__reflect(Score.prototype, "Score");
 var BeginScene = (function (_super) {
     __extends(BeginScene, _super);
     function BeginScene() {
@@ -683,7 +951,6 @@ var GameScene = (function (_super) {
             return;
         }
         this.addBlock(finalX, finalY);
-        console.log("点击到了第 " + finalX + " 行，第 " + finalY + " 列！");
     };
     // 添加一个方块
     GameScene.prototype.addBlock = function (x, y) {
@@ -691,7 +958,6 @@ var GameScene = (function (_super) {
         if (AiManager.pointArray.pointArr[x][y] != 0) {
             return;
         }
-        console.log(AiManager.pointArray.pointArr);
         // 创建一个方块
         var blockNode = this.createBlock();
         this.blockPanel.addChild(blockNode);
@@ -715,6 +981,15 @@ var GameScene = (function (_super) {
         //交替回合
         this.blockColor = !this.blockColor;
         this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑回合...";
+        if (this.blockColor == false) {
+            this.blockPanel.touchEnabled = false;
+            var arr = AiManager.ai.getPoint();
+            this.addBlock(arr[0], arr[1]);
+            console.log("电脑选择走第 " + arr[0] + " 行，第 " + arr[1] + " 列！");
+        }
+        else {
+            this.blockPanel.touchEnabled = true;
+        }
     };
     // 工厂方法，创建一个方块并返回。
     GameScene.prototype.createBlock = function () {
