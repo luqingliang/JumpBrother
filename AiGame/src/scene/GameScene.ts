@@ -99,13 +99,13 @@
 		blockNode.x = y * this.intervalNum + this.numberOneX;
 		blockNode.y = x * this.intervalNum + this.numberOneY;
 		//更新棋盘数组
-		AiManager.pointArray.pointArr[x][y] = this.blockColor?1:2;
+		AiManager.pointArray.put(x,y,this.blockColor);
 		// 把新创建的棋子加进入blockArr里
 		this.blockArr.push(blockNode);
 		// 记录最新的棋子
 		this.currentBlock = blockNode;
 		//判断输赢
-		if(AiManager.pointArray.searchWinner(x,y)) {
+		if(AiManager.pointArray.searchWinner(AiManager.pointArray.pointArr,x,y)) {
 			//赢了显示游戏结束面板
 			this.setGameOverPanel(true);
 		}

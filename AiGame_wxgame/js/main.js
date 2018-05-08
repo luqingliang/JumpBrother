@@ -43,20 +43,57 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var AiManager = (function () {
-    function AiManager() {
+var AiPlayer = (function () {
+    function AiPlayer() {
     }
     /**
-     * 初始化
+     * version1 : 先简单的随机一个位置下棋
+     * version2 : 随机棋子必须出现在敌方棋子相邻处（防守能力加强）
+     * version3 : 随机棋子即可出现在敌方棋子相邻处也可以出现在我方棋子相邻处
+     * version4 : 遍历搜索所有可以落子的点，并选择分数最高的点落子(这里先简单处理只遍历有邻居的点)
+     * version5 : 通过评估对白子最有利的点和对黑子最有利的点谁的分更高，来简单实现进攻和防守
      */
-    AiManager.init = function () {
-        this.pointArray = new PointArray();
-        this.score = new Score();
-        this.ai = new AiPlayer();
+    AiPlayer.prototype.getPoint = function () {
+        // for(let i = 0; i < (15 * 15); i++) {
+        // 	let x = Math.floor(Math.random() * 15);
+        // 	let y = Math.floor(Math.random() * 15);
+        // 	if(AiManager.pointArray.pointArr[x][y] == 0) {
+        // 		if(AiManager.pointArray.getNeighbor(x,y)) {
+        // 			return [x, y];
+        // 		}
+        // 	}
+        // }
+        var maxScore1 = 0;
+        var maxScore2 = 0;
+        var x = 0;
+        var y = 0;
+        var x1 = 0;
+        var y1 = 0;
+        for (var i = 0; i < 15; i++) {
+            for (var j = 0; j < 15; j++) {
+                if (AiManager.pointArray.pointArr[i][j] == R.empty && AiManager.pointArray.getNeighbor(AiManager.pointArray.pointArr, i, j)) {
+                    var c = AiManager.score.getScore(AiManager.pointArray.pointArr, i, j, R.com);
+                    var d = AiManager.score.getScore(AiManager.pointArray.pointArr, i, j, R.hum);
+                    if (c > maxScore1) {
+                        maxScore1 = c;
+                        x = i;
+                        y = j;
+                    }
+                    if (d > maxScore2) {
+                        maxScore2 = d;
+                        x1 = i;
+                        y1 = j;
+                    }
+                }
+            }
+        }
+        console.log('白子最大分数 ' + maxScore2);
+        console.log('黑子最大分数 ' + maxScore1);
+        return [(maxScore1 >= maxScore2 ? x : x1), (maxScore1 >= maxScore2 ? y : y1)]; //大于等于，优先进攻
     };
-    return AiManager;
+    return AiPlayer;
 }());
-__reflect(AiManager.prototype, "AiManager");
+__reflect(AiPlayer.prototype, "AiPlayer");
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -428,6 +465,20 @@ var ThemeAdapter = (function () {
     return ThemeAdapter;
 }());
 __reflect(ThemeAdapter.prototype, "ThemeAdapter", ["eui.IThemeAdapter"]);
+var AiManager = (function () {
+    function AiManager() {
+    }
+    /**
+     * 初始化
+     */
+    AiManager.init = function () {
+        this.pointArray = new PointArray();
+        this.score = new Score();
+        this.ai = new AiPlayer();
+    };
+    return AiManager;
+}());
+__reflect(AiManager.prototype, "AiManager");
 //////////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (c) 2014-present, Egret Technology.
@@ -477,57 +528,6 @@ var LoadingUI = (function (_super) {
     return LoadingUI;
 }(egret.Sprite));
 __reflect(LoadingUI.prototype, "LoadingUI", ["RES.PromiseTaskReporter"]);
-var AiPlayer = (function () {
-    function AiPlayer() {
-    }
-    /**
-     * version1 : 先简单的随机一个位置下棋
-     * version2 : 随机棋子必须出现在敌方棋子相邻处（防守能力加强）
-     * version3 : 随机棋子即可出现在敌方棋子相邻处也可以出现在我方棋子相邻处
-     * version4 : 遍历搜索所有可以落子的点，并选择分数最高的点落子(这里先简单处理只遍历有邻居的点)
-     * version5 : 通过评估对白子最有利的点和对黑子最有利的点谁的分更高，来简单实现进攻和防守
-     */
-    AiPlayer.prototype.getPoint = function () {
-        // for(let i = 0; i < (15 * 15); i++) {
-        // 	let x = Math.floor(Math.random() * 15);
-        // 	let y = Math.floor(Math.random() * 15);
-        // 	if(AiManager.pointArray.pointArr[x][y] == 0) {
-        // 		if(AiManager.pointArray.getNeighbor(x,y)) {
-        // 			return [x, y];
-        // 		}
-        // 	}
-        // }
-        var maxScore1 = 0;
-        var maxScore2 = 0;
-        var x = 0;
-        var y = 0;
-        var x1 = 0;
-        var y1 = 0;
-        for (var i = 0; i < 15; i++) {
-            for (var j = 0; j < 15; j++) {
-                if (AiManager.pointArray.pointArr[i][j] == 0 && AiManager.pointArray.getNeighbor(i, j)) {
-                    var c = AiManager.score.getScore(i, j, false);
-                    var d = AiManager.score.getScore(i, j, true);
-                    if (c > maxScore1) {
-                        maxScore1 = c;
-                        x = i;
-                        y = j;
-                    }
-                    if (d > maxScore2) {
-                        maxScore2 = d;
-                        x1 = i;
-                        y1 = j;
-                    }
-                }
-            }
-        }
-        console.log('白子最大分数 ' + maxScore2);
-        console.log('黑子最大分数 ' + maxScore1);
-        return [(maxScore1 >= maxScore2 ? x : x1), (maxScore1 >= maxScore2 ? y : y1)]; //大于等于，优先进攻
-    };
-    return AiPlayer;
-}());
-__reflect(AiPlayer.prototype, "AiPlayer");
 var PointArray = (function () {
     function PointArray() {
         /**
@@ -540,36 +540,60 @@ var PointArray = (function () {
         for (var i = 0; i < 15; i++) {
             this.pointArr[i] = new Array();
             for (var j = 0; j < 15; j++) {
-                this.pointArr[i][j] = 0;
+                this.pointArr[i][j] = R.empty;
             }
         }
     }
+    /**
+     * generator 函数
+     * @param arr:Array 棋盘数组 (目前就这一个参数，传入要分析的棋盘数组)
+     * 比较重要的一个函数用来返回可以落子的位置的数组
+     * 这个数组是优化重点，因为去掉一些没必要的位置可以大幅提升性能
+     */
+    PointArray.prototype.gen = function (arr) {
+        for (var i = 0; i < arr.length; i++) {
+            for (var j = 0; j < arr[i].length; j++) {
+                if (arr[i][j] == R.empty) {
+                    if (this.getNeighbor(arr, i, j)) {
+                        var scoreHum = AiManager.score.getScore(arr, i, j, R.hum);
+                        var scoreCom = AiManager.score.getScore(arr, i, j, R.com);
+                    }
+                }
+            }
+        }
+    };
     /**
      * 重置数组
      */
     PointArray.prototype.reSet = function () {
         for (var i = 0; i < 15; i++) {
             for (var j = 0; j < 15; j++) {
-                if (this.pointArr[i][j] != 0) {
-                    this.pointArr[i][j] = 0;
+                if (this.pointArr[i][j] != R.empty) {
+                    this.pointArr[i][j] = R.empty;
                 }
             }
         }
     };
     /**
-     * 获取某个位置是否有邻居
+     * 下棋（更新棋盘中的一个位置）
      */
-    PointArray.prototype.getNeighbor = function (x, y) {
-        if ((x > 0 && this.pointArr[x - 1][y] != 0) || (x < 14 && this.pointArr[x + 1][y] != 0)) {
+    PointArray.prototype.put = function (x, y, type) {
+        this.pointArr[x][y] = (type ? R.hum : R.com);
+    };
+    /**
+     * 获取传入的棋盘中，某个位置是否有邻居
+     */
+    PointArray.prototype.getNeighbor = function (arr, x, y) {
+        if ((x > 0 && arr[x - 1][y] != R.empty) || (x < 14 && arr[x + 1][y] != R.empty)) {
             return true;
         }
-        if ((y > 0 && this.pointArr[x][y - 1] != 0) || (y < 14 && this.pointArr[x][y + 1] != 0)) {
+        if ((y > 0 && arr[x][y - 1] != R.empty) || (y < 14 && arr[x][y + 1] != R.empty)) {
             return true;
         }
-        if ((x > 0 && y > 0 && this.pointArr[x - 1][y - 1] != 0) || (x < 14 && y < 14 && this.pointArr[x + 1][y + 1] != 0)) {
+        if ((x > 0 && y > 0 && arr[x - 1][y - 1] != R.empty) || (x < 14 && y < 14 && arr[x + 1][y + 1] != R.empty)) {
             return true;
         }
-        if ((x > 0 && y < 14 && this.pointArr[x - 1][y + 1] != 0) || (x < 14 && y > 0 && this.pointArr[x + 1][y - 1] != 0)) {
+        if ((x > 0 && y < 14 && arr[x - 1][y + 1] != R.empty) || (x < 14 && y > 0 && arr[x + 1][y - 1] != R.empty)) {
             return true;
         }
         return false;
@@ -667,56 +691,110 @@ var PointArray = (function () {
     return PointArray;
 }());
 __reflect(PointArray.prototype, "PointArray");
+/**
+ * 角色类
+ */
+var R = (function () {
+    function R() {
+    }
+    /**
+     * 人类
+     */
+    R.hum = 1;
+    /**
+     * 电脑
+     */
+    R.com = 2;
+    /**
+     * 空位置
+     */
+    R.empty = 0;
+    return R;
+}());
+__reflect(R.prototype, "R");
+/**
+ * 分数类 给单个棋形打分
+ * 用一个7位数表示棋型，从高位到低位分别表示
+ * 连五，活四，眠四，活三，活二/眠三，活一/眠二, 眠一
+ */
+var S = (function () {
+    function S() {
+    }
+    /**
+     * 活1
+     */
+    S.ONE = 10;
+    /**
+     * 活2
+     */
+    S.TWO = 100;
+    /**
+     * 活3
+     */
+    S.THREE = 1000;
+    /**
+     * 活4
+     */
+    S.FOUR = 100000;
+    /**
+     * 连5
+     */
+    S.FIVE = 1000000;
+    /**
+     * 眠1
+     */
+    S.BLOCKED_ONE = 1;
+    /**
+     * 眠2
+     */
+    S.BLOCKED_TWO = 10;
+    /**
+     * 眠3
+     */
+    S.BLOCKED_THREE = 100;
+    /**
+     * 眠4
+     */
+    S.BLOCKED_FOUR = 10000;
+    return S;
+}());
+__reflect(S.prototype, "S");
 var Score = (function () {
     function Score() {
-        /*
-        * 给单个棋形打分
-        * 用一个7位数表示棋型，从高位到低位分别表示
-        * 连五，活四，眠四，活三，活二/眠三，活一/眠二, 眠一
-        */
-        this.singleScore = {
-            ONE: 10,
-            TWO: 100,
-            THREE: 1000,
-            FOUR: 100000,
-            FIVE: 1000000,
-            BLOCKED_ONE: 1,
-            BLOCKED_TWO: 10,
-            BLOCKED_THREE: 100,
-            BLOCKED_FOUR: 10000
-        };
     }
     /**
      * 评分函数，返回单个位置八种可能性得分的合(原理和输赢判定函数差不多)
      * 判断的时候约定2就是电脑ai下的黑子
      * version1 : 电脑不能只考虑进攻，还要进行防守，所以这里新增一个代表黑子或者白子的标识位
+     * version2 : 考虑到之后要进行深度搜索预测，所以使用传入的棋盘数组进行评分
      */
-    Score.prototype.getScore = function (x, y, player) {
+    Score.prototype.getScore = function (arr, x, y, player) {
         var scoreSum = 0;
         var a = 0;
-        var isBlocked = false;
-        //横着是否有五连
+        var isBlockedLeft = false;
+        var isBlockedRight = false;
+        //横着连线
         for (var i = y + 1; i < 15; ++i) {
-            if (AiManager.pointArray.pointArr[x][i] == (player ? 1 : 2)) {
+            if (arr[x][i] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[x][i] == 0) {
+            else if (arr[x][i] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedLeft = true;
                 break;
             }
         }
         for (var i = y - 1; i >= 0; --i) {
-            if (AiManager.pointArray.pointArr[x][i] == (player ? 1 : 2)) {
+            if (arr[x][i] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[x][i] == 0) {
+            else if (arr[x][i] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedRight = true;
                 break;
             }
         }
@@ -724,32 +802,38 @@ var Score = (function () {
             scoreSum += this.matchingScore(500);
         }
         else {
-            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+            if (isBlockedLeft && isBlockedRight) {
+                scoreSum += 0;
+            }
+            else {
+                scoreSum += this.matchingScore((a + 1) * 100 + (isBlockedLeft || isBlockedRight ? 1 : 0));
+            }
         }
-        //竖着是否有五连
+        //竖着连线
         a = 0;
-        isBlocked = false;
+        isBlockedLeft = false;
+        isBlockedRight = false;
         for (var i = x + 1; i < 15; ++i) {
-            if (AiManager.pointArray.pointArr[i][y] == (player ? 1 : 2)) {
+            if (arr[i][y] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][y] == 0) {
+            else if (arr[i][y] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedLeft = true;
                 break;
             }
         }
         for (var i = x - 1; i >= 0; --i) {
-            if (AiManager.pointArray.pointArr[i][y] == (player ? 1 : 2)) {
+            if (arr[i][y] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][y] == 0) {
+            else if (arr[i][y] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedRight = true;
                 break;
             }
         }
@@ -757,32 +841,38 @@ var Score = (function () {
             scoreSum += this.matchingScore(500);
         }
         else {
-            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+            if (isBlockedLeft && isBlockedRight) {
+                scoreSum += 0;
+            }
+            else {
+                scoreSum += this.matchingScore((a + 1) * 100 + (isBlockedLeft || isBlockedRight ? 1 : 0));
+            }
         }
-        //正斜是否有五连
+        //正斜方向连线
         a = 0;
-        isBlocked = false;
+        isBlockedLeft = false;
+        isBlockedRight = false;
         for (var i = x - 1, j = y - 1; i >= 0 && j >= 0; --i, --j) {
-            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+            if (arr[i][j] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+            else if (arr[i][j] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedLeft = true;
                 break;
             }
         }
         for (var i = x + 1, j = y + 1; i < 15 && j < 15; ++i, ++j) {
-            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+            if (arr[i][j] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+            else if (arr[i][j] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedRight = true;
                 break;
             }
         }
@@ -790,32 +880,38 @@ var Score = (function () {
             scoreSum += this.matchingScore(500);
         }
         else {
-            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+            if (isBlockedLeft && isBlockedRight) {
+                scoreSum += 0;
+            }
+            else {
+                scoreSum += this.matchingScore((a + 1) * 100 + (isBlockedLeft || isBlockedRight ? 1 : 0));
+            }
         }
-        //反斜是否有五连
+        //反斜方向连线
         a = 0;
-        isBlocked = false;
+        isBlockedLeft = false;
+        isBlockedRight = false;
         for (var i = x - 1, j = y + 1; i >= 0 && j < 15; --i, ++j) {
-            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+            if (arr[i][j] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+            else if (arr[i][j] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedLeft = true;
                 break;
             }
         }
         for (var i = x + 1, j = y - 1; i < 15 && j >= 0; ++i, --j) {
-            if (AiManager.pointArray.pointArr[i][j] == (player ? 1 : 2)) {
+            if (arr[i][j] == player) {
                 a++;
             }
-            else if (AiManager.pointArray.pointArr[i][j] == 0) {
+            else if (arr[i][j] == R.empty) {
                 break;
             }
             else {
-                isBlocked = true;
+                isBlockedRight = true;
                 break;
             }
         }
@@ -823,7 +919,12 @@ var Score = (function () {
             scoreSum += this.matchingScore(500);
         }
         else {
-            scoreSum += this.matchingScore((a + 1) * 100 + (isBlocked ? 1 : 0));
+            if (isBlockedLeft && isBlockedRight) {
+                scoreSum += 0;
+            }
+            else {
+                scoreSum += this.matchingScore((a + 1) * 100 + (isBlockedLeft || isBlockedRight ? 1 : 0));
+            }
         }
         return scoreSum;
     };
@@ -833,23 +934,23 @@ var Score = (function () {
     Score.prototype.matchingScore = function (type) {
         switch (type) {
             case 100:
-                return this.singleScore.ONE;
+                return S.ONE;
             case 200:
-                return this.singleScore.TWO;
+                return S.TWO;
             case 300:
-                return this.singleScore.THREE;
+                return S.THREE;
             case 400:
-                return this.singleScore.FOUR;
+                return S.FOUR;
             case 500:
-                return this.singleScore.FIVE;
+                return S.FIVE;
             case 101:
-                return this.singleScore.BLOCKED_ONE;
+                return S.BLOCKED_ONE;
             case 201:
-                return this.singleScore.BLOCKED_TWO;
+                return S.BLOCKED_TWO;
             case 301:
-                return this.singleScore.BLOCKED_THREE;
+                return S.BLOCKED_THREE;
             case 401:
-                return this.singleScore.BLOCKED_FOUR;
+                return S.BLOCKED_FOUR;
             default:
                 return 0;
         }
@@ -968,7 +1069,7 @@ var GameScene = (function (_super) {
         blockNode.x = y * this.intervalNum + this.numberOneX;
         blockNode.y = x * this.intervalNum + this.numberOneY;
         //更新棋盘数组
-        AiManager.pointArray.pointArr[x][y] = this.blockColor ? 1 : 2;
+        AiManager.pointArray.put(x, y, this.blockColor);
         // 把新创建的棋子加进入blockArr里
         this.blockArr.push(blockNode);
         // 记录最新的棋子

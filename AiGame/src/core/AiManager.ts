@@ -13,6 +13,10 @@ class AiManager {
 	 * 电脑Ai模块
 	 */
 	public static ai: AiPlayer;
+	/**
+	 * Math工具模块
+	 */
+	public static math: MathTool;
 
 	/**
 	 * 初始化
@@ -21,5 +25,6 @@ class AiManager {
 		this.pointArray = new PointArray();
 		this.score = new Score();
 		this.ai = new AiPlayer();
+		this.math = new MathTool();
 	}
 }
