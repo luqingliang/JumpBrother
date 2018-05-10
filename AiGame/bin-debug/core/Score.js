@@ -49,15 +49,12 @@ var Score = (function () {
                         block++;
                     }
                 }
-                if (block > 1) {
-                    value += 0;
-                }
-                else {
+                if (block <= 1) {
                     value += this.matchingScore(count * 100 + block);
                 }
             }
-            return value;
         }
+        return value;
     };
     /**
      * 对单个位置进行评分，返回单个位置八种可能性得分的合(原理和输赢判定函数差不多)

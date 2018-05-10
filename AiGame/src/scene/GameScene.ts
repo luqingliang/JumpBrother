@@ -108,18 +108,17 @@
 		if(AiManager.pointArray.searchWinner(AiManager.pointArray.pointArr,x,y)) {
 			//赢了显示游戏结束面板
 			this.setGameOverPanel(true);
+		} 
+		//交替回合
+		this.blockColor = !this.blockColor;
+		this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
+		if(this.blockColor == false) { //AI下棋
+			this.blockPanel.touchEnabled = false;
+			let arr: Array<number> = AiManager.ai.getPoint();
+			this.addBlock(arr[0], arr[1]);
+			console.log("电脑选择走第 "+arr[0]+" 行，第 "+arr[1]+" 列！")
 		} else {
-			//交替回合
-			this.blockColor = !this.blockColor;
-			this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
-			if(this.blockColor == false) { //AI下棋
-				this.blockPanel.touchEnabled = false;
-				let arr: Array<number> = AiManager.ai.getPoint();
-				this.addBlock(arr[0], arr[1]);
-				console.log("电脑选择走第 "+arr[0]+" 行，第 "+arr[1]+" 列！")
-			} else {
-				this.blockPanel.touchEnabled = true;
-			}
+			this.blockPanel.touchEnabled = true;
 		}
 	}
 	// 工厂方法，创建一个方块并返回。

@@ -35,7 +35,6 @@ class Score {
 				} else {
 					block = lineArr[i]==R.empty?0:1;
 				}
-
 				//计算己方连续的棋子数
 				for(i = i+1; i < lineArr.length; i++) {
 					if(lineArr[i] == player) {
@@ -46,16 +45,13 @@ class Score {
 						block ++;
 					}
 				}
-
-				if(block > 1) {
-					value += 0;
-				} else {
+				if(block <= 1) {
 					value += this.matchingScore(count*100 + block);
 				}
 			}
-
-			return value;
 		}
+
+		return value;
 	}
 	/**
 	 * 对单个位置进行评分，返回单个位置八种可能性得分的合(原理和输赢判定函数差不多)
