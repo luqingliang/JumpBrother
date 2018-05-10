@@ -18,33 +18,36 @@ class AiPlayer {
 		// 		}
 		// 	}
 		// }
-		let maxScore1: number = 0;
-		let maxScore2: number = 0;
-		let x: number = 0;
-		let y: number = 0;
-		let x1: number = 0;
-		let y1: number = 0;
-		for(let i = 0; i < 15; i++) {
-			for(let j = 0; j < 15; j++) {
-				if(AiManager.pointArray.pointArr[i][j] == R.empty && AiManager.pointArray.getNeighbor(AiManager.pointArray.pointArr,i,j,1)) {
-					let c = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.com);
-					let d = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.hum);
-					if(c > maxScore1) {
-						maxScore1 = c;
-						x = i;
-						y = j;
-					}
-					if(d > maxScore2) {
-						maxScore2 = d;
-						x1 = i;
-						y1 = j;
-					}
-				}
-			}
-		}
-		console.log('白子最大分数 '+maxScore2);
-		console.log('黑子最大分数 '+maxScore1);
-		return [(maxScore1>=maxScore2?x:x1), (maxScore1>=maxScore2?y:y1)]; //大于等于，优先进攻
+		// let maxScore1: number = 0;
+		// let maxScore2: number = 0;
+		// let x: number = 0;
+		// let y: number = 0;
+		// let x1: number = 0;
+		// let y1: number = 0;
+		// for(let i = 0; i < 15; i++) {
+		// 	for(let j = 0; j < 15; j++) {
+		// 		if(AiManager.pointArray.pointArr[i][j] == R.empty && AiManager.pointArray.getNeighbor(AiManager.pointArray.pointArr,i,j,1)) {
+		// 			let c = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.com);
+		// 			let d = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.hum);
+		// 			if(c > maxScore1) {
+		// 				maxScore1 = c;
+		// 				x = i;
+		// 				y = j;
+		// 			}
+		// 			if(d > maxScore2) {
+		// 				maxScore2 = d;
+		// 				x1 = i;
+		// 				y1 = j;
+		// 			}
+		// 		}
+		// 	}
+		// }
+		// console.log('白子最大分数 '+maxScore2);
+		// console.log('黑子最大分数 '+maxScore1);
+		// return [(maxScore1>=maxScore2?x:x1), (maxScore1>=maxScore2?y:y1)]; //大于等于，优先进攻
+		var arr: Array<number> = this.MaxMin(AiManager.pointArray.pointArr);
+		console.log(arr);
+		return arr;
 	}
 	private MAX: number = S.FIVE * 10;
 	private MIN: number = -1 * this.MAX;
@@ -59,6 +62,10 @@ class AiPlayer {
 	public MaxMin(arr: Array<Array<number>>, deep: number = Config.searchDeep): Array<number> {
 		let best: number = this.MIN;
 		let points: Array<Array<number>> = AiManager.pointArray.gen(arr);
+
+		console.log("要遍历的落子点：");
+		console.log(points);
+
 		let bestPoints = [];
 
 		this.count = 0;
@@ -84,7 +91,10 @@ class AiPlayer {
 		}
 		
 		//从最优节点里面随机一个返回
+		console.log(bestPoints);
 		let result = bestPoints[Math.floor(bestPoints.length * Math.random())];
+
+		console.log("共搜索 " + this.count + "个节点！");
 
 		return result;
 	}
@@ -92,6 +102,7 @@ class AiPlayer {
 		let v: number = AiManager.score.evaluate(arr); //拿到局势分数
 		this.count ++;
 		if(deep <= 0 || AiManager.pointArray.win(arr)) { //如果搜索深度到底，或者可以直接赢棋，直接返回
+			console.log("最后赢的局势分= " + v);
 			return v;
 		}
 
@@ -107,11 +118,11 @@ class AiPlayer {
 			if(AiManager.math.littleThan(v, best)) { //找到更小分数的位置
 				best =  v;
 			}
-			//AB剪枝，暂时屏蔽
-			// if(AiManager.math.littleOrEqualThan(v, best)) {
-			// 	this.ABcut ++;
-			// 	return v;
-			// }
+			// AB剪枝
+			if(AiManager.math.littleOrEqualThan(v, best)) {
+				this.ABcut ++;
+				return v;
+			}
 		}
 		return best;
 	}
@@ -135,11 +146,11 @@ class AiPlayer {
 			if(AiManager.math.greatThan(v, best)) {
 				best = v;
 			}
-			//AB剪枝，暂时屏蔽
-			// if(AiManager.math.greatOrEqualThan(v, best)) {
-			// 	this.ABcut ++;
-			// 	return v;
-			// }
+			// AB剪枝
+			if(AiManager.math.greatOrEqualThan(v, best)) {
+				this.ABcut ++;
+				return v;
+			}
 		}
 		return best;
 	}

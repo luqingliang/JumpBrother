@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<e:Skin class="GameSceneSkin" width="640" height="1136" xmlns:e="http://ns.egret.com/eui" xmlns:w="http://ns.egret.com/wing" >
+	<w:Config id="16315ec6608" ></w:Config>
+	<e:Group left="0" right="0" top="0" bottom="0">
+		<e:Image left="0" top="0" bottom="0" right="0" source="bg_jpg" x="-139" y="-879" scaleX="1" scaleY="1"/>
+		<e:Label id="lab_huiHe" text="电脑回合" y="851.78" textColor="0x070707" size="40" fontFamily="Microsoft YaHei" horizontalCenter="0"/>
+		<e:Image id="img_bg" source="img_GoBang_bg_jpg" anchorOffsetX="0" anchorOffsetY="0" x="20" y="227" scaleX="1" scaleY="1" width="600" height="600"/>
+	</e:Group>
+	<e:Group id="blockPanel" bottom="309" width="600" height="600" horizontalCenter="0">
+
+
+
+
+	</e:Group>
+	<e:Group id="GameOverPanel" left="0" right="0" top="0" bottom="0" visible="false">
+		<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.6"/>
+		<e:Button id="btn_reStart" label="" y="775.94" horizontalCenter="0.5">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="restart_btn_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Label text="本次分数" x="220" y="190" size="50" fontFamily="Microsoft YaHei"/>
+		<e:Label id="lab_overWinner" text="白方胜利" y="480" size="80" fontFamily="Microsoft YaHei" anchorOffsetX="0" width="414.06" textAlign="center" verticalAlign="middle" textColor="0x09f796" horizontalCenter="0"/>
+		<e:Label id="lab_overScore" text="0" y="278" size="50" fontFamily="Microsoft YaHei" verticalAlign="middle" anchorOffsetX="0" width="391" horizontalCenter="0" textAlign="center"/>
+	</e:Group>
+</e:Skin>

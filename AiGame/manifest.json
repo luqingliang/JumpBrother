@@ -16,8 +16,15 @@
 		"bin-debug/Platform.js",
 		"bin-debug/SceneManager.js",
 		"bin-debug/ThemeAdapter.js",
+		"bin-debug/core/AiManager.js",
+		"bin-debug/core/AiPlayer.js",
+		"bin-debug/core/Config.js",
+		"bin-debug/core/MathTool.js",
+		"bin-debug/core/PointArray.js",
+		"bin-debug/core/R.js",
+		"bin-debug/core/S.js",
+		"bin-debug/core/Score.js",
 		"bin-debug/scene/BeginScene.js",
-		"bin-debug/scene/GameOverScene.js",
 		"bin-debug/scene/GameScene.js"
 	]
 }

@@ -61,7 +61,7 @@ class PointArray {
 						} else {
 							neighbors.push([i,j]);
 						}
-					} else if(this.getNeighbor(arr,i,j,2)) { //没有相邻的情况下判断两步之内是否有邻居，我为了提高效率最多考虑到这样
+					} else if(this.getNeighbor(arr,i,j,2)) { //没有相邻的情况下判断两步之内是否有邻居，为了提高效率最多考虑到这样
 						nextNeighbors.push([i,j]);
 					}
 				}
@@ -142,7 +142,11 @@ class PointArray {
 	 * 下棋（更新棋盘中的一个位置）
 	 */
 	public put(x: number, y: number, type: boolean) {
-		this.pointArr[x][y] = (type?R.hum:R.com);
+		if(this.pointArr[x][y] == 0) {
+			this.pointArr[x][y] = (type?R.hum:R.com);
+		} else {
+			console.log("棋盘数组插入棋子错误！！！");
+		}
 	}
 	/**
 	 * 获取传入的棋盘中，某个位置是否有邻居

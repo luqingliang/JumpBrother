@@ -18,7 +18,9 @@ var SceneManager = (function (_super) {
     SceneManager.prototype.init = function () {
         this.beginScene = new BeginScene();
         this.gameScene = new GameScene();
-        this.gameOverScene = new GameOverScene();
+        //也在这里初始化AiManager类
+        AiManager.init();
+        console.log(AiManager.pointArray.pointArr);
         this.addChild(this.beginScene);
     };
     /**
@@ -33,15 +35,17 @@ var SceneManager = (function (_super) {
     /**
      * 切换场景
      */
-    SceneManager.prototype.changeScene = function (type) {
+    SceneManager.prototype.changeScene = function (type, data) {
+        if (data === void 0) { data = null; }
         if (type != SceneManager.BEGIN_SCENE) {
+            console.log(this.beginScene);
             this.beginScene.release();
         }
         if (type != SceneManager.GAME_SCENE) {
             this.gameScene.release();
         }
-        if (type != SceneManager.GAMEOVER_SCENC) {
-            this.gameOverScene.release();
+        if (data != null) {
+            this[type].update(data);
         }
         this.removeChildren();
         this.addChild(this[type]);
@@ -54,10 +58,6 @@ var SceneManager = (function (_super) {
      * 游戏中场景名
      */
     SceneManager.GAME_SCENE = "gameScene";
-    /**
-     * 游戏结束场景名
-     */
-    SceneManager.GAMEOVER_SCENC = "gameOverScene";
     return SceneManager;
 }(egret.Sprite));
 __reflect(SceneManager.prototype, "SceneManager");

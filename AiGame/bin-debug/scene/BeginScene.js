@@ -27,7 +27,7 @@ var BeginScene = (function (_super) {
     };
     BeginScene.prototype.tapHandler = function () {
         //切换到游戏中场景
-        SceneManager.Instance().changeScene(SceneManager.GAME_SCENE);
+        SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
     };
     BeginScene.prototype.release = function () {
         if (this.btn_begin.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {

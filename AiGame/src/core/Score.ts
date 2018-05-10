@@ -52,9 +52,9 @@ class Score {
 				} else {
 					value += this.matchingScore(count*100 + block);
 				}
-
-				return value;
 			}
+
+			return value;
 		}
 	}
 	/**
