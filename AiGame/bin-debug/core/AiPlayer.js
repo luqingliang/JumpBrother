@@ -12,6 +12,7 @@ var AiPlayer = (function () {
      * version3 : 随机棋子即可出现在敌方棋子相邻处也可以出现在我方棋子相邻处
      * version4 : 遍历搜索所有可以落子的点，并选择分数最高的点落子(这里先简单处理只遍历有邻居的点)
      * version5 : 通过评估对白子最有利的点和对黑子最有利的点谁的分更高，来简单实现进攻和防守
+     * version6 : 历史启发，记录搜索分数，减少重复搜索，提高效率
      */
     AiPlayer.prototype.getPoint = function () {
         // for(let i = 0; i < (15 * 15); i++) {
@@ -51,7 +52,6 @@ var AiPlayer = (function () {
         // console.log('黑子最大分数 '+maxScore1);
         // return [(maxScore1>=maxScore2?x:x1), (maxScore1>=maxScore2?y:y1)]; //大于等于，优先进攻
         var arr = this.MaxMin(AiManager.pointArray.pointArr);
-        console.log(arr);
         return arr;
     };
     /**
@@ -64,8 +64,6 @@ var AiPlayer = (function () {
         if (deep === void 0) { deep = Config.searchDeep; }
         var best = this.MIN;
         var points = AiManager.pointArray.gen(arr);
-        console.log("要遍历的落子点：");
-        console.log(points);
         var bestPoints = [];
         this.count = 0;
         this.ABcut = 0;
@@ -95,7 +93,6 @@ var AiPlayer = (function () {
         var v = AiManager.score.evaluate(arr); //拿到局势分数
         this.count++;
         if (deep <= 0 || AiManager.pointArray.win(arr)) {
-            console.log("最后赢的局势分= " + v);
             return v;
         }
         var best = this.MAX;

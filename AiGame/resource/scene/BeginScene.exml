@@ -10,4 +10,10 @@
 			</e:Skin>
 		</e:skinName>
 	</e:Button>
+	<e:Group id="selectPanel" left="0" right="0" top="0" bottom="0" visible="false">
+		<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.6"/>
+		<e:Button id="btn_playWithAi" label="人机对战" x="270.5" y="348"/>
+		<e:Button id="btn_playWithPlayer" label="联机对战" x="270.5" y="440.68"/>
+		<e:Label text="请选择游戏模式" y="165" size="50" fontFamily="Microsoft JhengHei" textColor="0xfcf9f9" horizontalCenter="0"/>
+	</e:Group>
 </e:Skin>

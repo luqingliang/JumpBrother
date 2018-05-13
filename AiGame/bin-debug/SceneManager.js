@@ -20,7 +20,6 @@ var SceneManager = (function (_super) {
         this.gameScene = new GameScene();
         //也在这里初始化AiManager类
         AiManager.init();
-        console.log(AiManager.pointArray.pointArr);
         this.addChild(this.beginScene);
     };
     /**

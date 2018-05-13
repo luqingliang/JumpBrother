@@ -102,12 +102,26 @@ var GameScene = (function (_super) {
         }
         //交替回合
         this.blockColor = !this.blockColor;
-        this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑回合...";
+        if (Config.isPVP) {
+            this.lab_huiHe.text = this.blockColor ? "我方回合..." : "对方回合...";
+        }
+        else {
+            this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑正在思考...";
+        }
+        var timer = new egret.Timer(100, 1);
+        timer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.timerHandler, this);
+        timer.start();
+    };
+    GameScene.prototype.timerHandler = function () {
         if (this.blockColor == false) {
             this.blockPanel.touchEnabled = false;
-            var arr = AiManager.ai.getPoint();
-            this.addBlock(arr[0], arr[1]);
-            console.log("电脑选择走第 " + arr[0] + " 行，第 " + arr[1] + " 列！");
+            if (Config.isPVP) {
+            }
+            else {
+                var arr = AiManager.ai.getPoint();
+                this.addBlock(arr[0], arr[1]);
+                console.log("电脑选择走第 " + arr[0] + " 行，第 " + arr[1] + " 列！");
+            }
         }
         else {
             this.blockPanel.touchEnabled = true;

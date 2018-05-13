@@ -17,6 +17,10 @@ class AiManager {
 	 * Math工具模块
 	 */
 	public static math: MathTool;
+	/**
+	 * webSocket模块
+	 */
+	public static webSocket: Sockets;
 
 	/**
 	 * 初始化
@@ -26,5 +30,6 @@ class AiManager {
 		this.score = new Score();
 		this.ai = new AiPlayer();
 		this.math = new MathTool();
+		this.webSocket = new Sockets();
 	}
 }

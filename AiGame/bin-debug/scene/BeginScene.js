@@ -23,9 +23,37 @@ var BeginScene = (function (_super) {
     };
     //初始化，并绑定事件
     BeginScene.prototype.init = function () {
+        this.showPanel(false);
         this.btn_begin.addEventListener(egret.TouchEvent.TOUCH_TAP, this.tapHandler, this);
     };
     BeginScene.prototype.tapHandler = function () {
+        this.showPanel(true);
+    };
+    BeginScene.prototype.showPanel = function (status) {
+        if (status) {
+            this.selectPanel.visible = true;
+            this.btn_playWithAi.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithAi, this);
+            this.btn_playWithPlayer.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithPlayer, this);
+        }
+        else {
+            this.selectPanel.visible = false;
+            if (this.btn_playWithAi.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_playWithAi.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithAi, this);
+            }
+            if (this.btn_playWithPlayer.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_playWithPlayer.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithPlayer, this);
+            }
+        }
+    };
+    BeginScene.prototype.clickPlayWithAi = function () {
+        Config.isPVP = false;
+        //切换到游戏中场景
+        SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
+    };
+    BeginScene.prototype.clickPlayWithPlayer = function () {
+        Config.isPVP = true;
+        //建立socket连接
+        AiManager.webSocket.getConnect();
         //切换到游戏中场景
         SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
     };

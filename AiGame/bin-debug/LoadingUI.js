@@ -46,13 +46,15 @@ var LoadingUI = (function (_super) {
     LoadingUI.prototype.createView = function () {
         this.textField = new egret.TextField();
         this.addChild(this.textField);
-        this.textField.y = 300;
+        this.textField.y = 500;
+        this.textField.x = 70;
         this.textField.width = 480;
         this.textField.height = 100;
         this.textField.textAlign = "center";
+        this.textField.textColor = 1;
     };
     LoadingUI.prototype.onProgress = function (current, total) {
-        this.textField.text = "Loading..." + current + "/" + total;
+        this.textField.text = "\u52A0\u8F7D\u4E2D..." + current + "/" + total;
     };
     return LoadingUI;
 }(egret.Sprite));

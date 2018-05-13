@@ -111,12 +111,25 @@
 		} 
 		//交替回合
 		this.blockColor = !this.blockColor;
-		this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
-		if(this.blockColor == false) { //AI下棋
+		if(Config.isPVP) {
+			this.lab_huiHe.text = this.blockColor?"我方回合...":"对方回合...";
+		} else {
+			this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑正在思考...";
+		}
+		let timer: egret.Timer = new egret.Timer(100,1);
+		timer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.timerHandler,this);
+		timer.start();
+	}
+	private timerHandler() {
+		if(this.blockColor == false) { //AI下棋或者对方下棋
 			this.blockPanel.touchEnabled = false;
-			let arr: Array<number> = AiManager.ai.getPoint();
-			this.addBlock(arr[0], arr[1]);
-			console.log("电脑选择走第 "+arr[0]+" 行，第 "+arr[1]+" 列！")
+			if(Config.isPVP) {
+
+			} else {
+				let arr: Array<number> = AiManager.ai.getPoint();
+				this.addBlock(arr[0], arr[1]);
+				console.log("电脑选择走第 "+arr[0]+" 行，第 "+arr[1]+" 列！")
+			}
 		} else {
 			this.blockPanel.touchEnabled = true;
 		}

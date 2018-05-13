@@ -12,6 +12,7 @@ var AiManager = (function () {
         this.score = new Score();
         this.ai = new AiPlayer();
         this.math = new MathTool();
+        this.webSocket = new Sockets();
     };
     return AiManager;
 }());

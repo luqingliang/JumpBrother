@@ -28,13 +28,14 @@
       "name": "tween"
     },
     {
-      "name": "socket"
-    },
-    {
       "name": "promise"
     },
     {
       "name": "game"
+    },
+    {
+      "name": "socket.io",
+      "path": "../libSocket/bin/socket.io"
     }
   ]
 }

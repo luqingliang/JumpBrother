@@ -5,9 +5,13 @@ var Config = (function () {
     function Config() {
     }
     /**
+     * 是否是玩家对战
+     */
+    Config.isPVP = false;
+    /**
      * 搜索深度
      */
-    Config.searchDeep = 2;
+    Config.searchDeep = 4;
     /**
      * gen函数返回的节点数量上限，超过之后将会按照分数进行截断
      */
