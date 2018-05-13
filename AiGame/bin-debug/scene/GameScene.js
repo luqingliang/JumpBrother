@@ -37,14 +37,23 @@ var GameScene = (function (_super) {
         _super.prototype.childrenCreated.call(this);
         this.init();
         this.reset();
-        this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑回合...";
+        if (Config.isPVP) {
+            this.lab_huiHe.text = this.blockColor ? "我方回合..." : "对方回合...";
+        }
+        else {
+            this.lab_huiHe.text = this.blockColor ? "玩家回合..." : "电脑正在思考...";
+        }
     };
     GameScene.prototype.init = function () {
         this.setGameOverPanel(false);
+        this.showNotice();
+        this.lab_playerNum.visible = Config.isPVP;
+        this.lab_timeDown.visible = Config.isPVP;
         this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png", "img_GoBang_bg_png"];
         //添加触摸点击事件
         this.blockPanel.touchEnabled = true;
         this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickHandler, this);
+        this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP, this.backHandler, this);
     };
     //触摸点击事件的回调
     GameScene.prototype.clickHandler = function (e) {
@@ -95,6 +104,10 @@ var GameScene = (function (_super) {
         this.blockArr.push(blockNode);
         // 记录最新的棋子
         this.currentBlock = blockNode;
+        //发送我方下的位置
+        if (this.blockColor) {
+            AiManager.webSocket.sendPoint({ x: x, y: y });
+        }
         //判断输赢
         if (AiManager.pointArray.searchWinner(AiManager.pointArray.pointArr, x, y)) {
             //赢了显示游戏结束面板
@@ -127,7 +140,7 @@ var GameScene = (function (_super) {
             this.blockPanel.touchEnabled = true;
         }
     };
-    // 工厂方法，创建一个方块并返回。
+    // 工厂方法，创建一个棋子image对象并返回。
     GameScene.prototype.createBlock = function () {
         var blockNode = new eui.Image();
         // 根据是谁的回合来确定背景图
@@ -151,11 +164,20 @@ var GameScene = (function (_super) {
      * 控制游戏结束面板的显示隐藏
      * @param type:boolean
      */
-    GameScene.prototype.setGameOverPanel = function (type) {
+    GameScene.prototype.setGameOverPanel = function (type, timeOut) {
+        if (timeOut === void 0) { timeOut = false; }
         this.GameOverPanel.visible = type;
         if (type) {
-            this.lab_overWinner.text = this.blockColor ? "白方胜利" : "黑方胜利";
+            if (timeOut) {
+                this.lab_overWinner.text = this.blockColor ? "我方超时" : "对方超时";
+            }
+            else {
+                this.lab_overWinner.text = this.blockColor ? "我方胜利" : "对方胜利";
+            }
             this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP, this.reStartHandler, this);
+            if (Config.isPVP) {
+                AiManager.webSocket.sendGameOver();
+            }
         }
         else {
             if (this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
@@ -163,14 +185,79 @@ var GameScene = (function (_super) {
             }
         }
     };
+    /**
+     * 控制警告面板
+     */
+    GameScene.prototype.showNotice = function (obj) {
+        if (obj === void 0) { obj = null; }
+        if (obj == null) {
+            this.noticePanel.visible = false;
+            if (this.btn_ok.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_ok.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.okHandler, this);
+            }
+            if (this.btn_cancel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_cancel.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.cancelHandler, this);
+            }
+        }
+        else {
+            this.noticePanel.visible = true;
+            this.lab_title.text = obj.title;
+            this.lab_body.text = obj.body;
+            this.btn_ok.addEventListener(egret.TouchEvent.TOUCH_TAP, this.okHandler, this);
+            this.btn_cancel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.cancelHandler, this);
+        }
+    };
+    /**
+     * 控制文字的显示
+     */
+    GameScene.prototype.updateText = function (texts) {
+        this.lab_huiHe.text = texts;
+    };
+    /**
+     * 控制是否接收鼠标事件
+     */
+    GameScene.prototype.setTouchEnabled = function (status) {
+        this.blockPanel.touchEnabled = status;
+        this.blockColor = status;
+    };
+    /**
+     * 更新在线玩家数量
+     */
+    GameScene.prototype.updatePlayerNum = function (num) {
+        this.lab_playerNum.text = "当前在线玩家人数：" + num;
+    };
+    /**
+     * 更新PVP回合倒计时显示
+     */
+    GameScene.prototype.updateTimeDown = function (num) {
+        this.lab_timeDown.text = num.toString();
+    };
+    GameScene.prototype.cancelHandler = function () {
+        this.showNotice();
+    };
+    GameScene.prototype.okHandler = function () {
+        this.showNotice();
+        this.reset();
+        SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
+    };
     GameScene.prototype.reStartHandler = function () {
         this.reset();
         this.setGameOverPanel(false);
+        if (Config.isPVP) {
+            AiManager.webSocket.getRival();
+        }
+    };
+    GameScene.prototype.backHandler = function () {
+        this.reset();
+        SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
     };
     GameScene.prototype.release = function () {
         this.reset();
         if (this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
             this.btn_reStart.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.reStartHandler, this);
+        }
+        if (this.btn_back.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+            this.btn_back.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.backHandler, this);
         }
     };
     return GameScene;

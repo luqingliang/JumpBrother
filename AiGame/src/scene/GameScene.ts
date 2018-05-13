@@ -2,18 +2,33 @@
 
 	//游戏场景组
 	public blockPanel:eui.Group;
+	//返回按钮
+	public btn_back:eui.Button;
+	//游戏当前在线人数
+	public lab_playerNum:eui.Label;
+	//PVP回合倒计时
+	public lab_timeDown:eui.Label;
     //游戏结束面板
     public GameOverPanel:eui.Group;
     //再来一次按钮
     public btn_reStart:eui.Button;
-    //结束游戏计分
-    public lab_overScore:eui.Label;
 	//棋盘
 	public img_bg:eui.Image;
 	//回合的显示
 	public lab_huiHe:eui.Label;
 	//结束界面显示输赢情况
 	public lab_overWinner:eui.Label;
+	//警告面板
+	public noticePanel:eui.Group;
+	//警告标题
+	public lab_title:eui.Label;
+	//警告内容
+	public lab_body:eui.Label;
+	//取消按钮
+	public btn_cancel:eui.Button;
+	//确认按钮
+	public btn_ok:eui.Button;
+
 
 	// 所有方块资源的数组
     private blockSourceNames: Array<string> = [];
@@ -46,15 +61,24 @@
 		super.childrenCreated();
 		this.init();
 		this.reset();
-		this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑回合...";
+		if(Config.isPVP) {
+			this.lab_huiHe.text = this.blockColor?"我方回合...":"对方回合...";
+		} else {
+			this.lab_huiHe.text = this.blockColor?"玩家回合...":"电脑正在思考...";
+		}
 	}
-	private init() {
+	public init() {
         this.setGameOverPanel(false);
+		this.showNotice();
+
+		this.lab_playerNum.visible = Config.isPVP;
+		this.lab_timeDown.visible = Config.isPVP;
 
 		this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png","img_GoBang_bg_png"];
 		//添加触摸点击事件
 		this.blockPanel.touchEnabled = true;
 		this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickHandler,this);
+		this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP,this.backHandler,this);
 	}
 	//触摸点击事件的回调
 	private clickHandler(e:egret.TouchEvent) {
@@ -84,7 +108,7 @@
 		this.addBlock(finalX, finalY);
 	}
 	// 添加一个方块
-	private addBlock(x: number, y: number) {
+	public addBlock(x: number, y: number) {
 		//先检查这个位置上是否有有棋子
 		if(AiManager.pointArray.pointArr[x][y] != 0) {
 			return;
@@ -104,6 +128,10 @@
 		this.blockArr.push(blockNode);
 		// 记录最新的棋子
 		this.currentBlock = blockNode;
+		//发送我方下的位置
+		if(this.blockColor) {
+			AiManager.webSocket.sendPoint({x:x,y:y});
+		}
 		//判断输赢
 		if(AiManager.pointArray.searchWinner(AiManager.pointArray.pointArr,x,y)) {
 			//赢了显示游戏结束面板
@@ -134,7 +162,7 @@
 			this.blockPanel.touchEnabled = true;
 		}
 	}
-	// 工厂方法，创建一个方块并返回。
+	// 工厂方法，创建一个棋子image对象并返回。
 	private createBlock(): eui.Image {
 		var blockNode = new eui.Image();
 		// 根据是谁的回合来确定背景图
@@ -158,26 +186,96 @@
      * 控制游戏结束面板的显示隐藏
      * @param type:boolean
      */
-    private setGameOverPanel(type: boolean) {
+    public setGameOverPanel(type: boolean, timeOut: boolean = false) {
         this.GameOverPanel.visible = type;
         if(type) {
-			this.lab_overWinner.text = this.blockColor?"白方胜利":"黑方胜利";
+			if(timeOut) {
+				this.lab_overWinner.text = this.blockColor?"我方超时":"对方超时";
+			} else {
+				this.lab_overWinner.text = this.blockColor?"我方胜利":"对方胜利";
+			}
             this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
+			if(Config.isPVP) {
+				AiManager.webSocket.sendGameOver();
+			}
         } else {
             if(this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
                 this.btn_reStart.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
             }
         }
     }
+	/**
+	 * 控制警告面板
+	 */
+	public showNotice(obj: any = null) {
+		if(obj == null) {
+			this.noticePanel.visible = false;
+			if(this.btn_ok.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+				this.btn_ok.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.okHandler,this);
+			}
+			if(this.btn_cancel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+				this.btn_cancel.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.cancelHandler,this);
+			}
+		} else {
+			this.noticePanel.visible = true;
+			this.lab_title.text = obj.title;
+			this.lab_body.text = obj.body;
+			this.btn_ok.addEventListener(egret.TouchEvent.TOUCH_TAP,this.okHandler,this);
+			this.btn_cancel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.cancelHandler,this);
+		}
+	}
+	/**
+	 * 控制文字的显示
+	 */
+	public updateText(texts: string) {
+		this.lab_huiHe.text = texts;
+	}
+	/**
+	 * 控制是否接收鼠标事件
+	 */
+	public setTouchEnabled(status: boolean) {
+		this.blockPanel.touchEnabled = status;
+		this.blockColor = status;
+	}
+	/**
+	 * 更新在线玩家数量
+	 */
+	public updatePlayerNum(num: number) {
+		this.lab_playerNum.text = "当前在线玩家人数：" + num;
+	}
+	/**
+	 * 更新PVP回合倒计时显示
+	 */
+	public updateTimeDown(num: number) {
+		this.lab_timeDown.text = num.toString();
+	}
+	private cancelHandler() {
+		this.showNotice();
+	}
+	private okHandler() {
+		this.showNotice();
+		this.reset();
+		SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
+	}
     private reStartHandler() {
         this.reset();
         this.setGameOverPanel(false);
+		if(Config.isPVP) {
+			AiManager.webSocket.getRival();
+		}
     }
+	private backHandler() {
+		this.reset();
+		SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
+	}
 	public release() {
         this.reset();
 
 		if(this.btn_reStart.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
             this.btn_reStart.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.reStartHandler,this);
         }
+		if(this.btn_back.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+			this.btn_back.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.backHandler,this);
+		}
 	}
 }

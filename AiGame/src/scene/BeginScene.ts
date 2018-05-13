@@ -25,7 +25,7 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 		this.init();
 	}
 	//初始化，并绑定事件
-	private init() {
+	public init() {
 		this.showPanel(false);
 		this.btn_begin.addEventListener(egret.TouchEvent.TOUCH_TAP,this.tapHandler,this);
 	}
@@ -48,16 +48,16 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 		}
 	}
 	private clickPlayWithAi() {
+		this.showPanel(false);
 		Config.isPVP = false;
 		//切换到游戏中场景
 		SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
 	}
 	private clickPlayWithPlayer() {
+		this.showPanel(false);
 		Config.isPVP = true;
 		//建立socket连接
 		AiManager.webSocket.getConnect();
-		//切换到游戏中场景
-		SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
 	}
 	public release() {
 		if(this.btn_begin.hasEventListener(egret.TouchEvent.TOUCH_TAP)){

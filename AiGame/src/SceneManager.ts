@@ -38,6 +38,9 @@ class SceneManager extends egret.Sprite {
 		}
 		return SceneManager._instance;
 	}
+	public get _gameScene(): GameScene {
+		return this.gameScene;
+	}
 	/**
 	 * 切换场景
 	 */
@@ -54,5 +57,6 @@ class SceneManager extends egret.Sprite {
 		}
 		this.removeChildren();
 		this.addChild(this[type]);
+		this[type].init();
 	}
 }

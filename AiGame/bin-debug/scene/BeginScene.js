@@ -46,16 +46,16 @@ var BeginScene = (function (_super) {
         }
     };
     BeginScene.prototype.clickPlayWithAi = function () {
+        this.showPanel(false);
         Config.isPVP = false;
         //切换到游戏中场景
         SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
     };
     BeginScene.prototype.clickPlayWithPlayer = function () {
+        this.showPanel(false);
         Config.isPVP = true;
         //建立socket连接
         AiManager.webSocket.getConnect();
-        //切换到游戏中场景
-        SceneManager.Instance().changeScene(SceneManager.GAME_SCENE, true);
     };
     BeginScene.prototype.release = function () {
         if (this.btn_begin.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {

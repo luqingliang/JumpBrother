@@ -15,7 +15,8 @@
 		"eui.ItemRenderer": "resource/eui_skins/ItemRendererSkin.exml",
 		"BeginScene": "resource/scene/BeginScene.exml",
 		"GameScene": "resource/scene/GameScene.exml",
-		"GameOverScene": "resource/scene/GameOverScene.exml"
+		"GameOverScene": "resource/scene/GameOverScene.exml",
+		"Dialog": "resource/scene/Dialog.exml"
 	},
 	"autoGenerateExmlsList": true,
 	"exmls": [

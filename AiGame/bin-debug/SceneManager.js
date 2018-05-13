@@ -31,6 +31,13 @@ var SceneManager = (function (_super) {
         }
         return SceneManager._instance;
     };
+    Object.defineProperty(SceneManager.prototype, "_gameScene", {
+        get: function () {
+            return this.gameScene;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * 切换场景
      */
@@ -48,6 +55,7 @@ var SceneManager = (function (_super) {
         }
         this.removeChildren();
         this.addChild(this[type]);
+        this[type].init();
     };
     /**
      * 开始游戏场景名

@@ -4,7 +4,17 @@
 	<e:Group left="0" right="0" top="0" bottom="0">
 		<e:Image left="0" top="0" bottom="0" right="0" source="bg_jpg" x="-139" y="-879" scaleX="1" scaleY="1"/>
 		<e:Label id="lab_huiHe" text="电脑回合" y="851.78" textColor="0x070707" size="40" fontFamily="Microsoft YaHei" horizontalCenter="0"/>
-		<e:Image id="img_bg" source="img_GoBang_bg_jpg" anchorOffsetX="0" anchorOffsetY="0" x="20" y="227" scaleX="1" scaleY="1" width="600" height="600"/>
+		<e:Image id="img_bg" source="img_GoBang_bg_jpg" anchorOffsetX="0" anchorOffsetY="0" x="20" y="227" scaleX="1" scaleY="1" width="600" height="600" alpha="0.8"/>
+		<e:Button id="btn_back" label="" x="548.48" y="25">
+			<e:skinName>
+				<e:Skin states="up,down,disabled">
+				<e:Image width="100%" height="100%" source="back_btn_png"/>
+				<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+				</e:Skin>
+			</e:skinName>
+		</e:Button>
+		<e:Label id="lab_playerNum" text="当前在线人数：" x="15.5" y="25" textColor="0x020202" fontFamily="Microsoft YaHei" size="20"/>
+		<e:Label id="lab_timeDown" text="30" y="161.24" textColor="0x020202" fontFamily="Microsoft YaHei" size="40" horizontalCenter="0.5"/>
 	</e:Group>
 	<e:Group id="blockPanel" bottom="309" width="600" height="600" horizontalCenter="0">
 
@@ -22,8 +32,29 @@
 				</e:Skin>
 			</e:skinName>
 		</e:Button>
-		<e:Label text="本次分数" x="220" y="190" size="50" fontFamily="Microsoft YaHei"/>
+		<e:Label text="对局结束" x="220" y="190" size="50" fontFamily="Microsoft YaHei"/>
 		<e:Label id="lab_overWinner" text="白方胜利" y="480" size="80" fontFamily="Microsoft YaHei" anchorOffsetX="0" width="414.06" textAlign="center" verticalAlign="middle" textColor="0x09f796" horizontalCenter="0"/>
-		<e:Label id="lab_overScore" text="0" y="278" size="50" fontFamily="Microsoft YaHei" verticalAlign="middle" anchorOffsetX="0" width="391" horizontalCenter="0" textAlign="center"/>
+
+	</e:Group>
+	<e:Group id="noticePanel" left="0" right="0" top="0" bottom="0" visible="false">
+		<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.8" x="0" y="0" scaleX="1" scaleY="1"/>
+		<e:Label id="lab_title" text="这是标题" y="171.36" size="50" fontFamily="Microsoft YaHei" horizontalCenter="0" x="220.00000000000003" scaleX="1" scaleY="1"/>
+		<e:Label id="lab_body" text="这里是内容内容内容" y="352.85" size="30" fontFamily="Microsoft YaHei" anchorOffsetX="0" width="548.48" anchorOffsetY="0" height="313.63" horizontalCenter="0" x="46.00000000000001" scaleX="1" scaleY="1"/>
+		<e:Button id="btn_cancel" label="" x="132.12" y="751.67" scaleX="1" scaleY="1">
+		<e:skinName>
+			<e:Skin states="up,down,disabled">
+			<e:Image width="100%" height="100%" source="setting_off_png"/>
+			<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+			</e:Skin>
+		</e:skinName>
+		</e:Button>
+		<e:Button id="btn_ok" label="" x="398.18000000000006" y="751.67" scaleX="1" scaleY="1">
+		<e:skinName>
+			<e:Skin states="up,down,disabled">
+			<e:Image width="100%" height="100%" source="setting_on_png"/>
+			<e:Label id="labelDisplay" horizontalCenter="0" verticalCenter="0"/>
+			</e:Skin>
+		</e:skinName>
+		</e:Button>
 	</e:Group>
 </e:Skin>
