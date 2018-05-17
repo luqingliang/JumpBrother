@@ -16,6 +16,10 @@ var GameScene = (function (_super) {
         _this.blockSourceNames = [];
         // 所有方块的数组
         _this.blockArr = [];
+        // 对方最新下棋的位置
+        _this.pointNow1 = { x: 0, y: 0 };
+        //我方最新下棋的位置
+        _this.pointNow2 = { x: 0, y: 0 };
         //每一格之间的间隔(准确的应该是38.5，测试逐渐修改)
         _this.intervalNum = 38.5;
         //点击事件容差
@@ -49,11 +53,19 @@ var GameScene = (function (_super) {
         this.showNotice();
         this.lab_playerNum.visible = Config.isPVP;
         this.lab_timeDown.visible = Config.isPVP;
+        this.btn_regret.visible = !Config.isPVP;
+        this.btn_changePower.visible = !Config.isPVP;
+        this.lab_notice.visible = false;
         this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png", "img_GoBang_bg_png"];
         //添加触摸点击事件
         this.blockPanel.touchEnabled = true;
         this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickHandler, this);
         this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP, this.backHandler, this);
+        if (!Config.isPVP) {
+            this.btn_regret.addEventListener(egret.TouchEvent.TOUCH_TAP, this.regretHandler, this);
+            this.btn_changePower.addEventListener(egret.TouchEvent.TOUCH_TAP, this.changePowerHandler, this);
+            this.setWhoFirst(true);
+        }
     };
     //触摸点击事件的回调
     GameScene.prototype.clickHandler = function (e) {
@@ -103,9 +115,18 @@ var GameScene = (function (_super) {
         // 把新创建的棋子加进入blockArr里
         this.blockArr.push(blockNode);
         // 记录最新的棋子
-        this.currentBlock = blockNode;
-        //发送我方下的位置
         if (this.blockColor) {
+            this.currentBlock2 = blockNode;
+            this.pointNow2.x = x;
+            this.pointNow2.y = y;
+        }
+        else {
+            this.currentBlock1 = blockNode;
+            this.pointNow1.x = x;
+            this.pointNow1.y = y;
+        }
+        //PVP模式发送我方下的位置
+        if (Config.isPVP && this.blockColor) {
             AiManager.webSocket.sendPoint({ x: x, y: y });
         }
         //判断输赢
@@ -161,6 +182,15 @@ var GameScene = (function (_super) {
         this.blockColor = true;
     };
     /**
+     * 悔棋模块
+     */
+    GameScene.prototype.regret = function () {
+        this.blockPanel.removeChild(this.currentBlock1);
+        this.blockPanel.removeChild(this.currentBlock2);
+        AiManager.pointArray.regret(this.pointNow1.x, this.pointNow1.y);
+        AiManager.pointArray.regret(this.pointNow2.x, this.pointNow2.y);
+    };
+    /**
      * 控制游戏结束面板的显示隐藏
      * @param type:boolean
      */
@@ -208,6 +238,45 @@ var GameScene = (function (_super) {
         }
     };
     /**
+     * 控制更改棋力面板
+     */
+    GameScene.prototype.setChangePower = function (type) {
+        this.changePowerPanel.visible = type;
+        if (type) {
+            this.lab_deeps.text = Config.searchDeep.toString();
+            this.lab_long.text = Config.countLimit.toString();
+            this.changePowerPanel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.changePowerPanelHandler, this);
+        }
+        else {
+            if (this.changePowerPanel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.changePowerPanel.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.changePowerPanelHandler, this);
+            }
+        }
+    };
+    /**
+     * 控制警告提示框的显示
+     */
+    GameScene.prototype.showNoticeLable = function (texts) {
+        this.lab_notice.visible = true;
+        this.lab_notice.text = texts;
+        var tw = egret.Tween.get(this.lab_notice);
+        tw.to({ visible: false }, 1000);
+    };
+    /**
+     * 控制选择先手面板
+     */
+    GameScene.prototype.setWhoFirst = function (type) {
+        this.whoFirstPanel.visible = type;
+        if (type) {
+            this.whoFirstPanel.addEventListener(egret.TouchEvent.TOUCH_TAP, this.whoFirstHandler, this);
+        }
+        else {
+            if (this.whoFirstPanel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.whoFirstPanel.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.whoFirstHandler, this);
+            }
+        }
+    };
+    /**
      * 控制文字的显示
      */
     GameScene.prototype.updateText = function (texts) {
@@ -232,6 +301,21 @@ var GameScene = (function (_super) {
     GameScene.prototype.updateTimeDown = function (num) {
         this.lab_timeDown.text = num.toString();
     };
+    GameScene.prototype.whoFirstHandler = function (e) {
+        switch (e.target) {
+            case this.btn_humanFirst: {
+                this.setWhoFirst(false);
+                break;
+            }
+            case this.btn_comFirst: {
+                this.setWhoFirst(false);
+                this.blockColor = false;
+                this.blockPanel.touchEnabled = false;
+                this.addBlock(7, 7);
+                break;
+            }
+        }
+    };
     GameScene.prototype.cancelHandler = function () {
         this.showNotice();
     };
@@ -250,6 +334,46 @@ var GameScene = (function (_super) {
     GameScene.prototype.backHandler = function () {
         this.reset();
         SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
+    };
+    GameScene.prototype.regretHandler = function () {
+        this.regret();
+    };
+    GameScene.prototype.changePowerHandler = function () {
+        this.setChangePower(true);
+    };
+    GameScene.prototype.changePowerPanelHandler = function (e) {
+        switch (e.target) {
+            case this.btn_confirm: {
+                this.setChangePower(false);
+                break;
+            }
+            case this.btn_down1: {
+                if (Config.searchDeep > 2) {
+                    Config.searchDeep--;
+                }
+                break;
+            }
+            case this.btn_down2: {
+                if (Config.countLimit > 10) {
+                    Config.countLimit--;
+                }
+                break;
+            }
+            case this.btn_up1: {
+                if (Config.searchDeep < 8) {
+                    Config.searchDeep++;
+                }
+                break;
+            }
+            case this.btn_up2: {
+                if (Config.countLimit < 30) {
+                    Config.countLimit++;
+                }
+                break;
+            }
+        }
+        this.lab_deeps.text = Config.searchDeep.toString();
+        this.lab_long.text = Config.countLimit.toString();
     };
     GameScene.prototype.release = function () {
         this.reset();

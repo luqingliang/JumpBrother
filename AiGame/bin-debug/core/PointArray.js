@@ -91,9 +91,9 @@ var PointArray = (function () {
         //按照  连3>连2>紧挨相邻>隔空相邻  的顺序拼接其他情况的数组
         var result = threes.concat(twos.concat(neighbors.concat(nextNeighbors)));
         //如果结果数组的长度超过我们设定的限制，则截取分数更高的相应长度（测试阶段先不生效）
-        // if(result.length > Config.countLimit) {
-        // 	return result.slice(0,Config.countLimit);
-        // }
+        if (result.length > Config.countLimit) {
+            return result.slice(0, Config.countLimit);
+        }
         return result;
     };
     /**
@@ -159,6 +159,15 @@ var PointArray = (function () {
         }
         else {
             console.log("棋盘数组插入棋子错误！！！");
+        }
+    };
+    /**
+     * 悔棋
+     */
+    PointArray.prototype.regret = function (x, y) {
+        if (this.pointArr[x][y] != 0) {
+            this.pointArr[x][y] = 0;
+            console.log('悔棋成功！');
         }
     };
     /**

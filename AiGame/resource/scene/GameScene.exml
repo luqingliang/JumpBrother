@@ -14,7 +14,10 @@
 			</e:skinName>
 		</e:Button>
 		<e:Label id="lab_playerNum" text="当前在线人数：" x="15.5" y="25" textColor="0x020202" fontFamily="Microsoft YaHei" size="20"/>
+		<e:Label id="lab_notice" text="对不起，电脑已下棋，无法悔棋" y="118" fontFamily="Microsoft YaHei" size="20" textColor="0xf91616" horizontalCenter="0" textAlign="center"/>
 		<e:Label id="lab_timeDown" text="30" y="161.24" textColor="0x020202" fontFamily="Microsoft YaHei" size="40" horizontalCenter="0.5"/>
+		<e:Button id="btn_regret" label="悔棋" x="100" y="965"/>
+		<e:Button id="btn_changePower" label="更改棋力" x="448.48" y="965"/>
 	</e:Group>
 	<e:Group id="blockPanel" bottom="309" width="600" height="600" horizontalCenter="0">
 
@@ -56,5 +59,23 @@
 			</e:Skin>
 		</e:skinName>
 		</e:Button>
+	</e:Group>
+	<e:Group id="changePowerPanel" left="0" right="0" top="0" bottom="0" visible="false">
+		<e:Rect fillAlpha="0.6" left="1" right="-1" top="0" bottom="0"/>
+		<e:Label text="搜索深度（2-8）：" x="84.24" y="355" size="30" fontFamily="Microsoft YaHei"/>
+		<e:Label text="更改电脑棋力" y="141.82" size="40" fontFamily="Microsoft YaHei" horizontalCenter="0"/>
+		<e:Label id="lab_deeps" text="4" x="486.48" y="355" size="30" fontFamily="Microsoft YaHei" textAlign="center"/>
+		<e:Label id="lab_long" text="16" x="478.48" y="432" size="30" fontFamily="Microsoft YaHei" textAlign="center"/>
+		<e:Label text="搜索广度（10-30）：" x="86.24" y="432" size="30" fontFamily="Microsoft YaHei"/>
+		<e:Button id="btn_down1" label="减" x="433.48" y="355" width="30" height="30"/>
+		<e:Button id="btn_down2" label="减" x="433.48" y="432" width="30" height="30"/>
+		<e:Button id="btn_up2" label="加" x="533.48" y="432" width="30" height="30"/>
+		<e:Button id="btn_up1" label="加" x="533.48" y="355" width="30" height="30"/>
+		<e:Button id="btn_confirm" label="确认" x="274.24" y="615"/>
+	</e:Group>
+	<e:Group id="whoFirstPanel" left="0" right="0" top="0" bottom="0" visible="false">
+		<e:Rect left="0" right="0" top="0" bottom="0" fillAlpha="0.6"/>
+		<e:Button id="btn_comFirst" label="电脑先手" y="477" horizontalCenter="0"/>
+		<e:Button id="btn_humanFirst" label="玩家先手" y="385" horizontalCenter="0"/>
 	</e:Group>
 </e:Skin>

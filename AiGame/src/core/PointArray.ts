@@ -81,9 +81,9 @@ class PointArray {
 			)
 		);
 		//如果结果数组的长度超过我们设定的限制，则截取分数更高的相应长度（测试阶段先不生效）
-		// if(result.length > Config.countLimit) {
-		// 	return result.slice(0,Config.countLimit);
-		// }
+		if(result.length > Config.countLimit) {
+			return result.slice(0,Config.countLimit);
+		}
 		return result;
 	}
 	/**
@@ -146,6 +146,15 @@ class PointArray {
 			this.pointArr[x][y] = (type?R.hum:R.com);
 		} else {
 			console.log("棋盘数组插入棋子错误！！！");
+		}
+	}
+	/**
+	 * 悔棋
+	 */
+	public regret(x: number, y: number) {
+		if(this.pointArr[x][y] != 0) {
+			this.pointArr[x][y] = 0;
+			console.log('悔棋成功！');
 		}
 	}
 	/**

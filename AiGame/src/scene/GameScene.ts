@@ -28,14 +28,48 @@
 	public btn_cancel:eui.Button;
 	//确认按钮
 	public btn_ok:eui.Button;
+	//悔棋按钮
+	public btn_regret:eui.Button;
+	//更改计算机棋力的按钮
+	public btn_changePower:eui.Button;
+	//更改棋力的面板
+	public changePowerPanel:eui.Group;
+	//搜索深度减少
+	public btn_down1:eui.Button;
+	//搜索广度减少
+	public btn_down2:eui.Button;
+	//搜索广度增加
+	public btn_up2:eui.Button;
+	//搜索深度增加
+	public btn_up1:eui.Button;
+	//确认改变按钮
+	public btn_confirm:eui.Button;
+	//深度lable
+	public lab_deeps:eui.Label;
+	//广度lable
+	public lab_long:eui.Label;
+	//警告提示框
+	public lab_notice:eui.Label;
+	//选择先手的面板
+	public whoFirstPanel:eui.Group;
+	//电脑先手
+	public btn_comFirst:eui.Button;
+	//玩家先手
+	public btn_humanFirst:eui.Button;
 
 
 	// 所有方块资源的数组
     private blockSourceNames: Array<string> = [];
     // 所有方块的数组
     private blockArr: Array<eui.Image> = [];
-    // 当前的盒子（最新出现的盒子）
-    private currentBlock: eui.Image;
+    // 最新出现的黑（对方）子
+    private currentBlock1: eui.Image;
+	//最新出现的白（我方）子
+	private currentBlock2: eui.Image;
+	// 对方最新下棋的位置
+	private pointNow1: any = {x:0, y:0};
+	//我方最新下棋的位置
+	private pointNow2: any = {x:0, y:0};
 	//每一格之间的间隔(准确的应该是38.5，测试逐渐修改)
 	private intervalNum: number = 38.5;
 	//点击事件容差
@@ -73,12 +107,20 @@
 
 		this.lab_playerNum.visible = Config.isPVP;
 		this.lab_timeDown.visible = Config.isPVP;
+		this.btn_regret.visible = !Config.isPVP;
+		this.btn_changePower.visible = !Config.isPVP;
+		this.lab_notice.visible = false;
 
 		this.blockSourceNames = ["img_GoBang_white_png", "img_GoBang_black_png","img_GoBang_bg_png"];
 		//添加触摸点击事件
 		this.blockPanel.touchEnabled = true;
 		this.blockPanel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickHandler,this);
 		this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP,this.backHandler,this);
+		if(!Config.isPVP) {
+			this.btn_regret.addEventListener(egret.TouchEvent.TOUCH_TAP,this.regretHandler,this);
+			this.btn_changePower.addEventListener(egret.TouchEvent.TOUCH_TAP,this.changePowerHandler,this);
+			this.setWhoFirst(true);
+		}
 	}
 	//触摸点击事件的回调
 	private clickHandler(e:egret.TouchEvent) {
@@ -127,9 +169,18 @@
 		// 把新创建的棋子加进入blockArr里
 		this.blockArr.push(blockNode);
 		// 记录最新的棋子
-		this.currentBlock = blockNode;
-		//发送我方下的位置
 		if(this.blockColor) {
+			this.currentBlock2 = blockNode;
+			this.pointNow2.x = x;
+			this.pointNow2.y = y;
+		} else {
+			this.currentBlock1 = blockNode;	
+			this.pointNow1.x = x;
+			this.pointNow1.y = y;
+		}
+
+		//PVP模式发送我方下的位置
+		if(Config.isPVP && this.blockColor) {
 			AiManager.webSocket.sendPoint({x:x,y:y});
 		}
 		//判断输赢
@@ -181,7 +232,16 @@
 		this.blockArr.length = 0;
 		this.blockColor = true;
 	}
+	/**
+	 * 悔棋模块
+	 */
+	private regret() {
+		this.blockPanel.removeChild(this.currentBlock1);
+		this.blockPanel.removeChild(this.currentBlock2);
 
+		AiManager.pointArray.regret(this.pointNow1.x, this.pointNow1.y);
+		AiManager.pointArray.regret(this.pointNow2.x, this.pointNow2.y);
+	}
     /**
      * 控制游戏结束面板的显示隐藏
      * @param type:boolean
@@ -225,6 +285,43 @@
 		}
 	}
 	/**
+	 * 控制更改棋力面板
+	 */
+	private setChangePower(type: boolean) {
+		this.changePowerPanel.visible = type;
+		if(type) {
+			this.lab_deeps.text = Config.searchDeep.toString();
+			this.lab_long.text = Config.countLimit.toString();
+			this.changePowerPanel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.changePowerPanelHandler,this);
+		} else {
+			if(this.changePowerPanel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+				this.changePowerPanel.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.changePowerPanelHandler,this);
+			}
+		}
+	}
+	/**
+	 * 控制警告提示框的显示
+	 */
+	public showNoticeLable(texts: string) {
+		this.lab_notice.visible = true;
+		this.lab_notice.text = texts;
+		let tw = egret.Tween.get(this.lab_notice);
+		tw.to({visible:false}, 1000);
+	}
+	/**
+	 * 控制选择先手面板
+	 */
+	private setWhoFirst(type: boolean) {
+		this.whoFirstPanel.visible = type;
+		if(type) {
+			this.whoFirstPanel.addEventListener(egret.TouchEvent.TOUCH_TAP,this.whoFirstHandler,this);
+		} else {
+			if(this.whoFirstPanel.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+				this.whoFirstPanel.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.whoFirstHandler,this);
+			}
+		}
+	}
+	/**
 	 * 控制文字的显示
 	 */
 	public updateText(texts: string) {
@@ -249,6 +346,21 @@
 	public updateTimeDown(num: number) {
 		this.lab_timeDown.text = num.toString();
 	}
+	private whoFirstHandler(e: egret.TouchEvent) {
+		switch(e.target) {
+			case this.btn_humanFirst: {
+				this.setWhoFirst(false);
+				break;
+			}
+			case this.btn_comFirst: {
+				this.setWhoFirst(false);
+				this.blockColor = false;
+				this.blockPanel.touchEnabled = false;
+				this.addBlock(7, 7);
+				break;
+			}
+		}
+	}
 	private cancelHandler() {
 		this.showNotice();
 	}
@@ -267,6 +379,46 @@
 	private backHandler() {
 		this.reset();
 		SceneManager.Instance().changeScene(SceneManager.BEGIN_SCENE);
+	}
+	private regretHandler() {
+		this.regret();
+	}
+	private changePowerHandler() {
+		this.setChangePower(true);
+	}
+	private changePowerPanelHandler(e: egret.TouchEvent) {
+		switch(e.target) {
+			case this.btn_confirm: {
+				this.setChangePower(false);
+				break;
+			}
+			case this.btn_down1: {
+				if(Config.searchDeep > 2) {
+					Config.searchDeep --;
+				}
+				break;
+			}
+			case this.btn_down2: {
+				if(Config.countLimit > 10) {
+					Config.countLimit --;
+				}
+				break;
+			}
+			case this.btn_up1: {
+				if(Config.searchDeep < 8) {
+					Config.searchDeep ++;
+				}
+				break;
+			}
+			case this.btn_up2: {
+				if(Config.countLimit < 30) {
+					Config.countLimit ++;
+				}
+				break;
+			}
+		}
+		this.lab_deeps.text = Config.searchDeep.toString();
+		this.lab_long.text = Config.countLimit.toString();
 	}
 	public release() {
         this.reset();

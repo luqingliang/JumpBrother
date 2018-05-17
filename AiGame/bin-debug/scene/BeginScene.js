@@ -34,6 +34,7 @@ var BeginScene = (function (_super) {
             this.selectPanel.visible = true;
             this.btn_playWithAi.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithAi, this);
             this.btn_playWithPlayer.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithPlayer, this);
+            this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP, this.backHandler, this);
         }
         else {
             this.selectPanel.visible = false;
@@ -43,7 +44,13 @@ var BeginScene = (function (_super) {
             if (this.btn_playWithPlayer.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
                 this.btn_playWithPlayer.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.clickPlayWithPlayer, this);
             }
+            if (this.btn_back.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+                this.btn_back.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.backHandler, this);
+            }
         }
+    };
+    BeginScene.prototype.backHandler = function () {
+        this.showPanel(false);
     };
     BeginScene.prototype.clickPlayWithAi = function () {
         this.showPanel(false);

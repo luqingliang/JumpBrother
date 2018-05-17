@@ -8,6 +8,8 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 	public btn_playWithAi:eui.Button;
 	//玩家对战按钮
 	public btn_playWithPlayer:eui.Button;
+	//返回按钮
+	public btn_back:eui.Button;
 
 	public constructor() {
 		super();
@@ -37,6 +39,7 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 			this.selectPanel.visible = true;
 			this.btn_playWithAi.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickPlayWithAi,this);
 			this.btn_playWithPlayer.addEventListener(egret.TouchEvent.TOUCH_TAP,this.clickPlayWithPlayer,this);
+			this.btn_back.addEventListener(egret.TouchEvent.TOUCH_TAP,this.backHandler,this);
 		} else {
 			this.selectPanel.visible = false;
 			if(this.btn_playWithAi.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
@@ -45,7 +48,13 @@ class BeginScene extends eui.Component implements  eui.UIComponent {
 			if(this.btn_playWithPlayer.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
 				this.btn_playWithPlayer.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.clickPlayWithPlayer,this);
 			}
+			if(this.btn_back.hasEventListener(egret.TouchEvent.TOUCH_TAP)) {
+				this.btn_back.removeEventListener(egret.TouchEvent.TOUCH_TAP,this.backHandler,this);
+			}
 		}
+	}
+	private backHandler() {
+		this.showPanel(false);
 	}
 	private clickPlayWithAi() {
 		this.showPanel(false);
