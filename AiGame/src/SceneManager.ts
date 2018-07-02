@@ -9,8 +9,6 @@ class SceneManager extends egret.Sprite {
 	 */
 	public static GAME_SCENE: string = "gameScene";
 
-	//场景管理类的实例
-	private static _instance: SceneManager;
 	//开始游戏场景对象
 	private beginScene: BeginScene;
 	//游戏中场景对象
@@ -28,6 +26,8 @@ class SceneManager extends egret.Sprite {
 
 		this.addChild(this.beginScene);
 	}
+	//场景管理类的实例
+	private static _instance: SceneManager;
 	/**
 	 * 获取场景管理类的单例
 	 */
@@ -46,7 +46,6 @@ class SceneManager extends egret.Sprite {
 	 */
 	public changeScene(type, data:any = null) {
 		if(type != SceneManager.BEGIN_SCENE) {
-			console.log(this.beginScene);
 			this.beginScene.release();
 		}
 		if(type != SceneManager.GAME_SCENE) {

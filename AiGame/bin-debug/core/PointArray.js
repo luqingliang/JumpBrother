@@ -32,50 +32,72 @@ var PointArray = (function () {
         var twos = []; //连二
         var neighbors = []; //紧挨相邻
         var nextNeighbors = []; //隔空相邻
+        var noSortArr = [];
+        var noGenArr = [];
+        if (!Config.isGen) {
+            for (var a = 0; a < arr.length; a++) {
+                for (var b = 0; b < arr[a].length; b++) {
+                    if (arr[a][b] == R.empty) {
+                        noGenArr.push([a, b]);
+                    }
+                }
+            }
+            return noGenArr;
+        }
         for (var i = 0; i < arr.length; i++) {
             for (var j = 0; j < arr[i].length; j++) {
                 if (arr[i][j] == R.empty) {
                     if (this.getNeighbor(arr, i, j, 1)) {
-                        var scoreHum = AiManager.score.getScore(arr, i, j, R.hum);
-                        var scoreCom = AiManager.score.getScore(arr, i, j, R.com);
-                        //如果电脑可以连五，直接返回
-                        if (scoreCom >= S.FIVE) {
-                            return [[i, j]];
-                        }
-                        else if (scoreHum >= S.FIVE) {
-                            //玩家可以连5，先不要着急返回，因为没有遍历完的话电脑还是有可能连5的
-                            fives.push([i, j]);
-                        }
-                        else if (scoreCom >= S.FOUR) {
-                            fours.unshift([i, j]);
-                        }
-                        else if (scoreHum >= S.FOUR) {
-                            fours.push([i, j]);
-                        }
-                        else if (scoreCom >= 2 * S.THREE) {
-                            twoThrees.unshift([i, j]);
-                        }
-                        else if (scoreHum >= 2 * S.THREE) {
-                            twoThrees.push([i, j]);
-                        }
-                        else if (scoreCom >= S.THREE) {
-                            threes.unshift([i, j]);
-                        }
-                        else if (scoreHum >= S.THREE) {
-                            threes.push([i, j]);
-                        }
-                        else if (scoreCom >= S.TWO) {
-                            twos.unshift([i, j]);
-                        }
-                        else if (scoreHum >= S.TWO) {
-                            twos.push([i, j]);
+                        if (Config.isOmen) {
+                            var scoreHum = AiManager.score.getScore(arr, i, j, R.hum);
+                            var scoreCom = AiManager.score.getScore(arr, i, j, R.com);
+                            //如果电脑可以连五，直接返回
+                            if (scoreCom >= S.FIVE) {
+                                return [[i, j]];
+                            }
+                            else if (scoreHum >= S.FIVE) {
+                                //玩家可以连5，先不要着急返回，因为没有遍历完的话电脑还是有可能连5的
+                                fives.push([i, j]);
+                            }
+                            else if (scoreCom >= S.FOUR) {
+                                fours.unshift([i, j]);
+                            }
+                            else if (scoreHum >= S.FOUR) {
+                                fours.push([i, j]);
+                            }
+                            else if (scoreCom >= 2 * S.THREE) {
+                                twoThrees.unshift([i, j]);
+                            }
+                            else if (scoreHum >= 2 * S.THREE) {
+                                twoThrees.push([i, j]);
+                            }
+                            else if (scoreCom >= S.THREE) {
+                                threes.unshift([i, j]);
+                            }
+                            else if (scoreHum >= S.THREE) {
+                                threes.push([i, j]);
+                            }
+                            else if (scoreCom >= S.TWO) {
+                                twos.unshift([i, j]);
+                            }
+                            else if (scoreHum >= S.TWO) {
+                                twos.push([i, j]);
+                            }
+                            else {
+                                neighbors.push([i, j]);
+                            }
                         }
                         else {
-                            neighbors.push([i, j]);
+                            noSortArr.push([i, j]);
                         }
                     }
                     else if (this.getNeighbor(arr, i, j, 2)) {
-                        nextNeighbors.push([i, j]);
+                        if (Config.isOmen) {
+                            nextNeighbors.push([i, j]);
+                        }
+                        else {
+                            noSortArr.push([i, j]);
+                        }
                     }
                 }
             }
@@ -88,6 +110,9 @@ var PointArray = (function () {
         if (twoThrees.length)
             return twoThrees;
         //以上三种优先级最高，如果出现直接返回，不用向下再考虑
+        if (!Config.isOmen) {
+            return noSortArr;
+        }
         //按照  连3>连2>紧挨相邻>隔空相邻  的顺序拼接其他情况的数组
         var result = threes.concat(twos.concat(neighbors.concat(nextNeighbors)));
         //如果结果数组的长度超过我们设定的限制，则截取分数更高的相应长度（测试阶段先不生效）

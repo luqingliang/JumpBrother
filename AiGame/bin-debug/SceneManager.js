@@ -44,7 +44,6 @@ var SceneManager = (function (_super) {
     SceneManager.prototype.changeScene = function (type, data) {
         if (data === void 0) { data = null; }
         if (type != SceneManager.BEGIN_SCENE) {
-            console.log(this.beginScene);
             this.beginScene.release();
         }
         if (type != SceneManager.GAME_SCENE) {

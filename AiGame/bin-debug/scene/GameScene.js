@@ -66,6 +66,7 @@ var GameScene = (function (_super) {
             this.btn_changePower.addEventListener(egret.TouchEvent.TOUCH_TAP, this.changePowerHandler, this);
             this.setWhoFirst(true);
         }
+        console.log(AiManager.pointArray.pointArr);
     };
     //触摸点击事件的回调
     GameScene.prototype.clickHandler = function (e) {
@@ -202,7 +203,12 @@ var GameScene = (function (_super) {
                 this.lab_overWinner.text = this.blockColor ? "我方超时" : "对方超时";
             }
             else {
-                this.lab_overWinner.text = this.blockColor ? "我方胜利" : "对方胜利";
+                if (Config.isPVP) {
+                    this.lab_overWinner.text = this.blockColor ? "我方胜利" : "对方胜利";
+                }
+                else {
+                    this.lab_overWinner.text = this.blockColor ? "我方胜利" : "电脑胜利";
+                }
             }
             this.btn_reStart.addEventListener(egret.TouchEvent.TOUCH_TAP, this.reStartHandler, this);
             if (Config.isPVP) {

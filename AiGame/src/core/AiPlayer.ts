@@ -9,47 +9,33 @@ class AiPlayer {
 	 * version5 : 通过评估对白子最有利的点和对黑子最有利的点谁的分更高，来简单实现进攻和防守
 	 * version6 : 历史启发，记录搜索分数，减少重复搜索，提高效率
 	 */
-	public getPoint(): Array<number> {
-		// for(let i = 0; i < (15 * 15); i++) {
-		// 	let x = Math.floor(Math.random() * 15);
-		// 	let y = Math.floor(Math.random() * 15);
-		// 	if(AiManager.pointArray.pointArr[x][y] == 0) {
-		// 		if(AiManager.pointArray.getNeighbor(x,y)) {
-		// 			return [x, y];
-		// 		}
-		// 	}
-		// }
-		// let maxScore1: number = 0;
-		// let maxScore2: number = 0;
-		// let x: number = 0;
-		// let y: number = 0;
-		// let x1: number = 0;
-		// let y1: number = 0;
-		// for(let i = 0; i < 15; i++) {
-		// 	for(let j = 0; j < 15; j++) {
-		// 		if(AiManager.pointArray.pointArr[i][j] == R.empty && AiManager.pointArray.getNeighbor(AiManager.pointArray.pointArr,i,j,1)) {
-		// 			let c = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.com);
-		// 			let d = AiManager.score.getScore(AiManager.pointArray.pointArr,i,j,R.hum);
-		// 			if(c > maxScore1) {
-		// 				maxScore1 = c;
-		// 				x = i;
-		// 				y = j;
-		// 			}
-		// 			if(d > maxScore2) {
-		// 				maxScore2 = d;
-		// 				x1 = i;
-		// 				y1 = j;
-		// 			}
-		// 		}
-		// 	}
-		// }
-		// console.log('白子最大分数 '+maxScore2);
-		// console.log('黑子最大分数 '+maxScore1);
-		// return [(maxScore1>=maxScore2?x:x1), (maxScore1>=maxScore2?y:y1)]; //大于等于，优先进攻
-		var arr: Array<number> = this.MaxMin(AiManager.pointArray.pointArr);
-		return arr;
+	public getPoint(deep: number = Config.searchDeep): Array<number> {
+		//迭代加深
+		//注意这里不要比较分数的大小，因为深度越低算出来的分数越不靠谱，所以不能比较大小，而是是最高层的搜索分数为准
+		this.count = 0;
+		this.ABcut = 0;
+		this.timeNow = Date.now();
+		
+		let result;
+		for(let i=2;i<=deep; i+=2) {
+			result = this.MaxMin(AiManager.pointArray.pointArr, i);
+			console.log(result);
+			//如果出现必杀，直接返回
+			if(AiManager.math.greatOrEqualThan(result.score, S.FOUR)) {
+				let newTime: number = (Date.now() - this.timeNow) / 1000;
+				console.log("共搜索节点数：" + this.count);
+				console.log("共剪枝次数：" + this.ABcut);
+				console.log("本次思考耗时：" + newTime + "s");
+				return result;
+			}
+		}
+		let newTime: number = (Date.now() - this.timeNow) / 1000;
+		console.log("共搜索节点数：" + this.count);
+		console.log("共剪枝次数：" + this.ABcut);
+		console.log("本次思考耗时：" + newTime + "s");
+		return result;
 	}
-	
+	private timeNow: number = 0;
 	private MAX: number = S.FIVE * 10;
 	private MIN: number = -1 * this.MAX;
 	private count: number; //计数
@@ -60,14 +46,11 @@ class AiPlayer {
 	 * @param arr:Array 棋盘数组
 	 * @param deep:number 搜索深度不传值就调用Config里面的配置
 	 */
-	public MaxMin(arr: Array<Array<number>>, deep: number = Config.searchDeep): Array<number> {
+	public MaxMin(arr: Array<Array<number>>, deep: number): Array<number> {
 		let best: number = this.MIN;
 		let points: Array<Array<number>> = AiManager.pointArray.gen(arr);
 
 		let bestPoints = [];
-
-		this.count = 0;
-		this.ABcut = 0;
 
 		for(let i = 0; i < points.length; i++) {
 			let p = points[i];
@@ -89,10 +72,7 @@ class AiPlayer {
 		}
 		
 		//从最优节点里面随机一个返回
-		console.log(bestPoints);
 		let result = bestPoints[Math.floor(bestPoints.length * Math.random())];
-
-		console.log("共搜索 " + this.count + "个节点！");
 
 		return result;
 	}
@@ -116,7 +96,7 @@ class AiPlayer {
 				best =  v;
 			}
 			// AB剪枝
-			if(AiManager.math.littleOrEqualThan(v, best)) {
+			if(Config.isAlphaBeta && AiManager.math.littleOrEqualThan(v, best)) {
 				this.ABcut ++;
 				return v;
 			}
@@ -144,7 +124,7 @@ class AiPlayer {
 				best = v;
 			}
 			// AB剪枝
-			if(AiManager.math.greatOrEqualThan(v, best)) {
+			if(Config.isAlphaBeta && AiManager.math.greatOrEqualThan(v, best)) {
 				this.ABcut ++;
 				return v;
 			}

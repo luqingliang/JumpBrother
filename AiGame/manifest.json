@@ -10,15 +10,15 @@
 		"libs/modules/socket.io/socket.io.js"
 	],
 	"game": [
-		"bin-debug/core/Config.js",
 		"bin-debug/AssetAdapter.js",
+		"bin-debug/LoadingUI.js",
 		"bin-debug/Main.js",
 		"bin-debug/Platform.js",
 		"bin-debug/SceneManager.js",
 		"bin-debug/ThemeAdapter.js",
 		"bin-debug/core/AiManager.js",
 		"bin-debug/core/AiPlayer.js",
-		"bin-debug/LoadingUI.js",
+		"bin-debug/core/Config.js",
 		"bin-debug/core/MathTool.js",
 		"bin-debug/core/PointArray.js",
 		"bin-debug/core/R.js",
